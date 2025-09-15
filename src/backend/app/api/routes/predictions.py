@@ -1,4 +1,4 @@
-﻿"""Predictive maintenance and anomaly detection routes."""
+"""Predictive maintenance and anomaly detection routes."""
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -11,18 +11,41 @@ from src.backend.app.schemas.maintenance import PredictionOut
 router = APIRouter(prefix="/predictions", tags=["Predictions & Anomalies"])
 
 
-@router.get("/", response_model=List[PredictionOut])
+@router.get("/", response_model=List[dict])
 async def list_predictions(
     risk_level: Optional[str] = Query(None, description="Filter by risk: CRITICAL, HIGH, MEDIUM, LOW"),
     session: AsyncSession = Depends(get_db)
 ):
-    """Lists component failure predictions across the fleet."""
-    query = select(Prediction)
+    """Lists component failure predictions across the fleet, enriched with asset and component metadata."""
+    query = (
+        select(Prediction, Component, Asset)
+        .join(Component, Prediction.component_id == Component.id)
+        .join(Asset, Component.asset_id == Asset.id)
+    )
     if risk_level:
         query = query.filter(Prediction.risk_level == risk_level.upper())
 
     result = await session.execute(query.order_by(Prediction.predicted_rul.asc()))
-    return result.scalars().all()
+    items = []
+    for pred, comp, asset in result.all():
+        items.append({
+            "id": pred.id,
+            "component_id": pred.component_id,
+            "asset_code": asset.asset_code,
+            "asset_name": asset.name,
+            "component_name": comp.name,
+            "component_type": comp.component_type,
+            "predicted_at": pred.predicted_at.isoformat(),
+            "predicted_rul": round(pred.predicted_rul, 1),
+            "confidence_interval_lower": round(pred.confidence_interval_lower, 1),
+            "confidence_interval_upper": round(pred.confidence_interval_upper, 1),
+            "risk_level": pred.risk_level,
+            "anomaly_score": round(pred.anomaly_score, 3),
+            "fails_before_mission": pred.fails_before_mission,
+            "explanation": pred.explanation,
+            "model_version": pred.model_version
+        })
+    return items
 
 
 @router.get("/asset/{asset_code}")

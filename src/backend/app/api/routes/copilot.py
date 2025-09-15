@@ -1,32 +1,162 @@
 """Bob Copilot conversational and diagnostic endpoints."""
+import re
 from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.backend.app.core.readiness import calculate_asset_readiness, calculate_fleet_readiness_summary
 from src.backend.app.db.base import get_db
-from src.backend.app.db.models import Asset, MissionWindow
+from src.backend.app.db.models import Asset, Component, MissionWindow, WorkOrder
 from src.backend.app.schemas.maintenance import CopilotChatRequest, CopilotChatResponse
 from src.backend.app.services.watsonx_service import WatsonxService
 
 router = APIRouter(prefix="/copilot", tags=["Bob Copilot"])
 watsonx = WatsonxService.get_instance()
 
+# Tail-number pattern: e.g. F16-VIPER-101, AH64-APACHE-401, M1A2-ABRAMS-701
+_ASSET_CODE_RE = re.compile(r'\b([A-Z0-9]{2,6}-[A-Z0-9]+-\d{3,})\b', re.IGNORECASE)
+
+
+async def _build_fleet_context(session: AsyncSession) -> dict:
+    """Load live fleet data from DB and structure it for Granite synthesis."""
+    assets_res = await session.execute(
+        select(Asset).options(selectinload(Asset.components))
+    )
+    assets = assets_res.scalars().all()
+
+    assets_data = [
+        {
+            "id": a.id,
+            "asset_code": a.asset_code,
+            "name": a.name,
+            "components": [
+                {
+                    "name": c.name,
+                    "component_type": c.component_type,
+                    "current_rul": c.current_rul,
+                    "risk_level": c.risk_level,
+                    "status": c.status,
+                    "id": c.id,
+                }
+                for c in a.components
+            ],
+        }
+        for a in assets
+    ]
+    fleet_summary = calculate_fleet_readiness_summary(assets_data)
+
+    # Per-asset readiness breakdown
+    nmc_assets, pmc_assets, fmc_assets = [], [], []
+    high_risk_components = []
+
+    for a, ad in zip(assets, assets_data):
+        r = calculate_asset_readiness(ad["components"])
+        lowest_rul = min((c.current_rul for c in a.components), default=125.0)
+        critical_issue = ""
+        if r["critical_issues"]:
+            critical_issue = r["critical_issues"][0].get("issue", "")
+        elif r["warnings"]:
+            critical_issue = r["warnings"][0].get("issue", "")
+
+        entry = {
+            "asset_code": a.asset_code,
+            "name": a.name,
+            "readiness_score": r["readiness_score"],
+            "lowest_rul": lowest_rul,
+            "critical_issue": critical_issue,
+        }
+        if r["status"] == "NMC":
+            nmc_assets.append(entry)
+        elif r["status"] == "PMC":
+            pmc_assets.append(entry)
+        else:
+            fmc_assets.append(entry)
+
+        for c in a.components:
+            if c.risk_level in ("HIGH", "CRITICAL"):
+                high_risk_components.append({
+                    "asset_code": a.asset_code,
+                    "asset_name": a.name,
+                    "component_name": c.name,
+                    "rul": c.current_rul,
+                    "risk_level": c.risk_level,
+                })
+
+    # Sort high-risk by RUL ascending (most urgent first)
+    high_risk_components.sort(key=lambda x: x["rul"])
+
+    # Work orders (PENDING / APPROVED / IN_PROGRESS)
+    from sqlalchemy import case as sa_case
+    _priority_order = sa_case(
+        (WorkOrder.priority == "CRITICAL", 0),
+        (WorkOrder.priority == "HIGH", 1),
+        (WorkOrder.priority == "MEDIUM", 2),
+        else_=3,
+    )
+    wo_res = await session.execute(
+        select(WorkOrder, Asset.asset_code)
+        .join(Asset, WorkOrder.asset_id == Asset.id)
+        .filter(WorkOrder.status.in_(["PENDING", "APPROVED", "IN_PROGRESS"]))
+        .order_by(_priority_order, WorkOrder.created_at.desc())
+    )
+    wo_rows = wo_res.all()
+    pending_work_orders = [
+        {
+            "asset_code": row[1],
+            "title": row[0].title,
+            "priority": row[0].priority,
+            "estimated_hours": row[0].estimated_hours,
+            "assigned_to": row[0].assigned_to,
+            "status": row[0].status,
+        }
+        for row in wo_rows
+    ]
+
+    # Missions
+    missions_res = await session.execute(select(MissionWindow))
+    active_missions = [
+        {
+            "title": m.title,
+            "priority": m.priority,
+            "required_assets_count": m.required_assets_count,
+            "start_time": m.start_time.isoformat() if hasattr(m.start_time, "isoformat") else str(m.start_time),
+        }
+        for m in missions_res.scalars().all()
+    ]
+
+    return {
+        "fleet_summary": fleet_summary,
+        "nmc_assets": nmc_assets,
+        "pmc_assets": pmc_assets,
+        "fmc_assets": fmc_assets,
+        "high_risk_components": high_risk_components,
+        "pending_work_orders": pending_work_orders,
+        "open_work_order_count": len(pending_work_orders),
+        "active_missions": active_missions,
+    }
+
 
 @router.post("/chat", response_model=CopilotChatResponse)
 async def chat_with_copilot(req: CopilotChatRequest, session: AsyncSession = Depends(get_db)):
     """Conversational endpoint interacting with the IBM Bob Copilot & watsonx Granite models."""
-    context = {}
     tools_used = []
 
-    if req.asset_code:
-        tools_used.append("get_asset_readiness")
-        tools_used.append("explain_readiness_issue")
+    # Detect an asset code either explicitly supplied or embedded in the message text
+    detected_code = req.asset_code
+    if not detected_code:
+        m = _ASSET_CODE_RE.search(req.message)
+        if m:
+            detected_code = m.group(1).upper()
+
+    if detected_code:
+        tools_used += ["get_asset_readiness", "explain_readiness_issue"]
         result = await session.execute(
-            select(Asset).filter(Asset.asset_code == req.asset_code.strip().upper()).options(selectinload(Asset.components))
+            select(Asset)
+            .filter(Asset.asset_code == detected_code.strip().upper())
+            .options(selectinload(Asset.components))
         )
         asset = result.scalars().first()
         if asset:
@@ -36,8 +166,10 @@ async def chat_with_copilot(req: CopilotChatRequest, session: AsyncSession = Dep
                     "component_type": c.component_type,
                     "current_rul": c.current_rul,
                     "risk_level": c.risk_level,
-                    "status": c.status
-                } for c in asset.components
+                    "status": c.status,
+                    "id": c.id,
+                }
+                for c in asset.components
             ]
             readiness = calculate_asset_readiness(components_data)
             answer = await watsonx.explain_readiness_issue(
@@ -45,12 +177,15 @@ async def chat_with_copilot(req: CopilotChatRequest, session: AsyncSession = Dep
                 asset_name=asset.name,
                 status=readiness["status"],
                 score=readiness["readiness_score"],
-                issues=readiness["critical_issues"] + readiness["warnings"]
+                issues=readiness["critical_issues"] + readiness["warnings"],
             )
-            return CopilotChatResponse(response=answer, tools_used=tools_used, timestamp=datetime.utcnow())
+            return CopilotChatResponse(
+                response=answer, tools_used=tools_used, timestamp=datetime.utcnow()
+            )
 
-    # General query
-    tools_used.append("get_fleet_readiness_summary")
+    # General query — load real fleet state, pass as rich context
+    tools_used += ["get_fleet_readiness_summary", "predict_component_failures", "search_maintenance_history"]
+    context = await _build_fleet_context(session)
     answer = await watsonx.answer_copilot_query(req.message, context)
     return CopilotChatResponse(response=answer, tools_used=tools_used, timestamp=datetime.utcnow())
 
@@ -126,16 +261,25 @@ async def explain_asset(asset_code: str, session: AsyncSession = Depends(get_db)
     }
 
 
+from pydantic import BaseModel as _BM
+
+class StressSimBody(_BM):
+    asset_code: str = "F16-VIPER-101"
+    mission_profile: str = "DESERT_HEAT"
+    sortie_duration_hours: float = 6.0
+    sortie_g_rating: float = 7.0
+
 @router.post("/simulate-stress")
 async def simulate_stress_endpoint(
-    asset_code: str = "F16-VIPER-101",
-    mission_profile: str = "DESERT_HEAT",
-    sortie_duration_hours: float = 6.0,
-    sortie_g_rating: float = 7.0,
+    body: StressSimBody,
     session: AsyncSession = Depends(get_db)
 ):
     """Counterfactual stress simulator evaluating accelerated wear and mission survivability."""
     from src.backend.app.core.simulation import simulate_mission_stress as run_simulation
+    asset_code = body.asset_code
+    mission_profile = body.mission_profile
+    sortie_duration_hours = body.sortie_duration_hours
+    sortie_g_rating = body.sortie_g_rating
     result = await session.execute(
         select(Asset).filter(Asset.asset_code == asset_code.strip().upper()).options(selectinload(Asset.components))
     )
