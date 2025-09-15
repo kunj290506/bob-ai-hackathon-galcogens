@@ -7,30 +7,46 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        display: ['Inter', '-apple-system', 'sans-serif'],
       },
       colors: {
-        defense: {
-          dark: '#06080d',
-          panel: '#0c101a',
-          card: '#0e1320',
-          border: '#1a2333',
-          accent: '#10b981',
-          danger: '#f43f5e',
-          warning: '#f59e0b',
-          fmc: '#10b981',
-          pmc: '#f59e0b',
-          nmc: '#f43f5e'
+        // Lamborghini Dark-Luxury Palette
+        lb: {
+          black: '#000000',
+          iron: '#181818',
+          charcoal: '#202020',
+          mid: '#494949',
+          steel: '#7D7D7D',
+          gold: '#FFC000',
+          'gold-hover': '#917300',
+          'gold-text': '#FFCE3E',
+          teal: '#1EAEDB',
+          cyan: '#29ABE2',
+          'link-blue': '#3860BE',
+          white: '#FFFFFF',
+          smoke: '#F5F5F5',
+          ash: '#7D7D7D',
+          // Status
+          fmc: '#22C55E',
+          pmc: '#F59E0B',
+          nmc: '#EF4444',
         }
       },
+      borderRadius: {
+        'none': '0px',
+        DEFAULT: '0px',
+        'sm': '0px',
+        'md': '0px',
+        'lg': '0px',
+        'xl': '0px',
+        '2xl': '0px',
+        'full': '9999px',
+      },
       boxShadow: {
-        'tactical': '0 4px 20px -2px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        'tactical-glow': '0 0 25px -4px rgba(16, 185, 129, 0.35)',
-        'danger-glow': '0 0 25px -4px rgba(244, 63, 94, 0.45)',
-        'amber-glow': '0 0 25px -4px rgba(245, 158, 11, 0.35)',
-        'blue-glow': '0 0 25px -4px rgba(59, 130, 246, 0.35)',
-      }
+        'none': 'none',
+      },
     },
   },
   plugins: [],

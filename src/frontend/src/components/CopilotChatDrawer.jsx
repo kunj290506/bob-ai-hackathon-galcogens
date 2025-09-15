@@ -1,67 +1,77 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, Send, Sparkles, Terminal, Bot, User, Radio, Cpu } from 'lucide-react'
+import { X, Send, Bot, User, Terminal, Cpu, AlertTriangle } from 'lucide-react'
 
-export default function CopilotChatDrawer({ isOpen, onClose, initialQuery }) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'IBM Bob Mission Readiness Copilot initialized.\n\nConnected to FastMCP server with 11 operational tools and watsonx.ai Granite 3-8B engine. Ready to execute telemetry diagnostics, C-MAPSS RUL forecasting, mission turnaround planning, and Air Tasking Order sortie matching.',
-      tools: ['get_fleet_readiness_summary', 'predict_component_failures', 'explain_readiness_issue']
-    }
-  ])
+const QUICK_PROMPTS = [
+  'Generate fleet readiness briefing',
+  'Which platforms are NMC / grounded?',
+  'Predict failures before 48h mission window',
+  'Show sortie matrix for F16-VIPER-101',
+  'Simulate desert heat stress for AH64-APACHE-401',
+  'What is the composite urgency of pending work orders?',
+]
+
+const INITIAL_MESSAGE = {
+  role: 'assistant',
+  content: 'IBM Bob Mission Readiness Copilot initialized.\n\nConnected to FastMCP server with 11 operational tools and IBM watsonx.ai Granite 3-8B engine.\n\nCapabilities: telemetry diagnostics, C-MAPSS RUL forecasting, mission turnaround planning, ATO sortie matching, AFTO Form 781A generation, anomaly detection, and commander briefing synthesis.',
+  tools: ['get_fleet_readiness_summary', 'predict_component_failures', 'explain_readiness_issue'],
+  ts: new Date().toLocaleTimeString(),
+}
+
+export default function CopilotChatDrawer({ isOpen, onClose, initialQuery, authHeader = {} }) {
+  const [messages, setMessages] = useState([INITIAL_MESSAGE])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const messagesEndRef = useRef(null)
+  const bottomRef = useRef(null)
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search)
-    const shouldAutoSend = searchParams.get('autoSend') === '1'
-    if (initialQuery) {
-      if (shouldAutoSend) {
-        handleSend(initialQuery)
-      } else {
-        setInput(initialQuery)
-      }
-    }
+    if (initialQuery) setInput(initialQuery)
   }, [initialQuery])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, loading])
 
-  const handleSend = async (textToSend) => {
-    const query = textToSend || input
-    if (!query.trim()) return
+  // Extract a tail-number asset code from a free-text message (e.g. "F16-VIPER-101")
+  const extractAssetCode = (text) => {
+    const m = text.match(/\b([A-Z0-9]{2,6}-[A-Z0-9]+-\d{3,})\b/i)
+    return m ? m[1].toUpperCase() : null
+  }
 
-    const userMsg = { role: 'user', content: query }
-    setMessages(prev => [...prev, userMsg])
+  const sendMessage = async (text) => {
+    const query = (text || input).trim()
+    if (!query) return
+    setMessages(prev => [...prev, { role: 'user', content: query, ts: new Date().toLocaleTimeString() }])
     setInput('')
     setLoading(true)
+
+    // If the message contains a tail number, route to the richer asset-specific path
+    const detectedCode = extractAssetCode(query)
 
     try {
       const res = await fetch('/api/v1/copilot/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: query })
+        headers: { 'Content-Type': 'application/json', ...authHeader },
+        body: JSON.stringify({ message: query, asset_code: detectedCode || undefined })
       })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.detail || `Backend error: ${res.status}`)
+      }
       const data = await res.json()
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: data.response,
-          tools: data.tools_used || []
-        }
-      ])
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.response || 'No response returned.',
+        tools: data.tools_used || [],
+        ts: new Date(data.timestamp || Date.now()).toLocaleTimeString(),
+      }])
     } catch (e) {
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: 'COMMUNICATION ERROR: Unable to reach Bob Copilot backend service. Ensure the FastAPI backend is running.',
-          tools: []
-        }
-      ])
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `COMMUNICATION ERROR: ${e.message}\n\nEnsure the FastAPI backend is running at localhost:8000. The MCP server must also be active.`,
+        tools: [],
+        ts: new Date().toLocaleTimeString(),
+        isError: true,
+      }])
     } finally {
       setLoading(false)
     }
@@ -69,136 +79,117 @@ export default function CopilotChatDrawer({ isOpen, onClose, initialQuery }) {
 
   if (!isOpen) return null
 
-  const quickPrompts = [
-    "Generate fleet readiness briefing",
-    "Identify NMC grounded platforms",
-    "Predict failures before 48h mission window",
-    "Show sortie re-allocation matrix for FA-101",
-    "Simulate desert heat stress for Viper 101"
-  ]
-
-  // Render assistant content with structured blocks
-  const renderMessageContent = (content) => {
-    return (
-      <div className="text-xs text-slate-200 whitespace-pre-wrap leading-relaxed space-y-2">
-        {content}
-      </div>
-    )
-  }
-
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/70 backdrop-blur-sm flex justify-end">
-      <div className="w-full max-w-lg bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col h-full animate-in slide-in-from-right duration-200">
+    <div className="chat-drawer" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="chat-panel animate-fade-in">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
-              <Bot className="w-4 h-4" />
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid #494949', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#202020', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, background: '#000', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Bot size={16} color="#FFC000" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <h3 className="text-xs font-semibold text-white tracking-wide uppercase">IBM Bob Operational Copilot</h3>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-purple-300 border border-purple-800/40">
-                  Granite 3-8B
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>IBM Bob Operational Copilot</p>
+                <span className="badge badge-gold" style={{ fontSize: 9 }}>Granite 3-8B</span>
               </div>
-              <p className="text-[11px] text-slate-400 flex items-center space-x-2 mt-0.5">
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                <span>FastMCP: 11 operational tools connected</span>
-              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                <div className="hex-live" />
+                <p style={{ fontSize: 9, color: '#7D7D7D', fontFamily: 'JetBrains Mono, monospace', margin: 0 }}>FastMCP: 11 tools connected</p>
+              </div>
             </div>
           </div>
-
-          <button 
-            onClick={onClose}
-            className="p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            aria-label="Close drawer"
-          >
-            <X className="w-4 h-4" />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#7D7D7D', padding: 4 }} aria-label="Close copilot">
+            <X size={18} />
           </button>
         </div>
 
-        {/* Quick Suggestion Chips */}
-        <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center space-x-1.5 overflow-x-auto text-[11px]">
-          <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider shrink-0 mr-1">Suggestions:</span>
-          {quickPrompts.map((qp, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSend(qp)}
-              className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-[11px] text-slate-300 hover:text-white border border-slate-700 whitespace-nowrap transition"
-            >
-              {qp}
-            </button>
+        {/* Quick prompts */}
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid #2A2A2A', display: 'flex', gap: 6, overflowX: 'auto', flexShrink: 0 }}>
+          <span style={{ fontSize: 9, color: '#494949', fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: '0.1em', alignSelf: 'center', flexShrink: 0 }}>QUICK:</span>
+          {QUICK_PROMPTS.map((qp, i) => (
+            <button key={i}
+              onClick={() => sendMessage(qp)}
+              style={{ padding: '4px 10px', background: '#202020', border: '1px solid #494949', cursor: 'pointer', fontSize: 10, color: '#969696', whiteSpace: 'nowrap', transition: 'border-color 0.2s, color 0.2s', flexShrink: 0 }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#FFC000'; e.currentTarget.style.color = '#fff' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#494949'; e.currentTarget.style.color = '#969696' }}
+            >{qp}</button>
           ))}
         </div>
 
-        {/* Message Thread */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/50">
-          {messages.map((m, idx) => {
-            const isUser = m.role === 'user'
-
+        {/* Messages */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {messages.map((msg, i) => {
+            const isUser = msg.role === 'user'
             return (
-              <div key={idx} className={`flex space-x-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
+              <div key={i} style={{ display: 'flex', gap: 8, justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
                 {!isUser && (
-                  <div className="w-6 h-6 rounded bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
-                    <Sparkles className="w-3 h-3" />
+                  <div style={{ width: 24, height: 24, background: '#000', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                    <Bot size={12} color="#FFC000" />
                   </div>
                 )}
-
-                <div className={`max-w-[85%] rounded-lg p-3.5 text-xs leading-relaxed ${
-                  isUser 
-                    ? 'bg-blue-600/90 text-white rounded-tr-none' 
-                    : 'bg-slate-800/90 border border-slate-700 text-slate-200 rounded-tl-none'
-                }`}>
-                  {renderMessageContent(m.content)}
-
-                  {!isUser && m.tools && m.tools.length > 0 && (
-                    <div className="mt-3 pt-2 border-t border-slate-700/60 flex items-center space-x-1.5 text-[10px] text-slate-400 font-mono">
-                      <Terminal className="w-3 h-3 text-sky-400" />
-                      <span>MCP Tools: {m.tools.join(', ')}</span>
+                <div style={{
+                  maxWidth: '85%',
+                  padding: '10px 14px',
+                  background: isUser ? '#FFC000' : msg.isError ? 'rgba(239,68,68,0.1)' : '#202020',
+                  border: isUser ? 'none' : msg.isError ? '1px solid rgba(239,68,68,0.4)' : '1px solid #2A2A2A',
+                  color: isUser ? '#000' : '#F5F5F5',
+                }}>
+                  <p style={{ fontSize: 12, lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontWeight: isUser ? 600 : 400 }}>
+                    {msg.content}
+                  </p>
+                  {!isUser && msg.tools && msg.tools.length > 0 && (
+                    <div style={{ marginTop: 8, paddingTop: 6, borderTop: '1px solid #494949', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <Terminal size={10} color="#29ABE2" />
+                      <span style={{ fontSize: 9, color: '#494949', fontFamily: 'JetBrains Mono, monospace' }}>MCP: {msg.tools.join(', ')}</span>
                     </div>
                   )}
+                  {msg.ts && (
+                    <p style={{ fontSize: 9, color: isUser ? 'rgba(0,0,0,0.4)' : '#494949', margin: 0, marginTop: 4, fontFamily: 'JetBrains Mono, monospace' }}>{msg.ts}</p>
+                  )}
                 </div>
-
                 {isUser && (
-                  <div className="w-6 h-6 rounded bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0 mt-0.5">
-                    <User className="w-3 h-3 text-slate-400" />
+                  <div style={{ width: 24, height: 24, background: '#202020', border: '1px solid #494949', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                    <User size={12} color="#7D7D7D" />
                   </div>
                 )}
               </div>
             )
           })}
           {loading && (
-            <div className="flex items-center space-x-2 text-xs text-slate-400 p-3 bg-slate-800/50 rounded-lg border border-slate-700/60">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-ping"></div>
-              <span>Executing FastMCP tool call & querying watsonx.ai Granite...</span>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-start' }}>
+              <div style={{ width: 24, height: 24, background: '#000', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                <Bot size={12} color="#FFC000" />
+              </div>
+              <div style={{ padding: '10px 14px', background: '#202020', border: '1px solid #2A2A2A', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className="spinner" style={{ width: 14, height: 14, borderWidth: 1.5 }} />
+                <span style={{ fontSize: 10, color: '#7D7D7D', fontFamily: 'JetBrains Mono, monospace' }}>Executing FastMCP tool calls...</span>
+              </div>
             </div>
           )}
-          <div ref={messagesEndRef} />
+          <div ref={bottomRef} />
         </div>
 
-        {/* Input Bar */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/80">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault()
-              handleSend()
-            }}
-            className="flex items-center space-x-2"
-          >
+        {/* Input */}
+        <div style={{ padding: '12px', borderTop: '1px solid #494949', flexShrink: 0 }}>
+          <form onSubmit={e => { e.preventDefault(); sendMessage() }} style={{ display: 'flex', gap: 8 }}>
             <input
-              type="text"
+              className="input-dark"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Bob: Query fleet readiness, RUL, or dispatch maintenance..."
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40"
+              onChange={e => setInput(e.target.value)}
+              placeholder="Ask Bob: fleet readiness, RUL forecasts, work orders..."
+              disabled={loading}
+              aria-label="Copilot message input"
+              style={{ flex: 1 }}
             />
             <button
               type="submit"
+              className="btn-gold-sm"
               disabled={loading || !input.trim()}
-              className="btn-primary !py-2 !px-3 disabled:opacity-40"
+              aria-label="Send message"
+              style={{ flexShrink: 0, minWidth: 44, padding: '0 14px' }}
             >
-              <Send className="w-3.5 h-3.5" />
+              <Send size={13} />
             </button>
           </form>
         </div>
