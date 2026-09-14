@@ -1,49 +1,69 @@
 # Architecture
 
-## System Architecture
-
-[Describe the overall architecture of your system. Replace the Mermaid diagram below with your actual architecture.]
+## System Diagram
 
 ```mermaid
-graph TD
-    A[User / Browser] -->|HTTP| B[Frontend - React]
-    B -->|REST API| C[Backend - FastAPI]
-    C -->|SDK| D[watsonx.ai]
-    C -->|Query| E[PostgreSQL]
-    C -->|Publish| F[Slack Webhook]
-    D -->|Inference Result| C
+flowchart LR
+    subgraph Data Layer
+        A["HUMS Sensors"] --> B["generate_data.py"]
+        B --> C["hums_sensor_data.csv"]
+    end
+
+    subgraph ML Layer
+        C --> D["train_model.py"]
+        D --> E["failure_model.joblib"]
+    end
+
+    subgraph Application Layer
+        C --> F["app.py (Streamlit)"]
+        E --> F
+        F --> G["Readiness Scores"]
+        F --> H["Failure Predictions"]
+        F --> I["Maintenance Plan"]
+    end
+
+    subgraph Dev Tooling
+        J["IBM Bob (Antigravity)"] -.->|scaffolded| B
+        J -.->|designed| D
+        J -.->|built| F
+    end
 ```
 
-## Components
+## Component Descriptions
 
-| Component | Technology | Responsibility |
-|---|---|---|
-| Frontend | [e.g., React 18] | [e.g., Dashboard UI, user interaction] |
-| Backend API | [e.g., FastAPI] | [e.g., Business logic, orchestration] |
-| AI / ML | [e.g., watsonx.ai] | [e.g., Anomaly scoring, classification] |
-| Database | [e.g., PostgreSQL] | [e.g., Storing pipeline events and scores] |
-| Notifications | [e.g., Slack API] | [e.g., Alerting on threshold breaches] |
+### Data Layer
 
-## Data Flow
+| Component           | File                | Purpose                                      |
+|---------------------|---------------------|----------------------------------------------|
+| Data Generator      | `generate_data.py`  | Creates synthetic HUMS sensor readings       |
+| Dataset             | `hums_sensor_data.csv` | 1000 rows across 25 assets, CSV format    |
 
-[Describe how data moves through your system from input to output.]
+The generator uses numpy's random number generation with a fixed seed for
+reproducibility. A deterministic failure pattern is injected so the model has
+a learnable signal.
 
-1. [e.g., Pipeline logs are ingested via a webhook from GitHub Actions]
-2. [e.g., Logs are preprocessed and chunked into 512-token segments]
-3. [e.g., Each chunk is sent to the watsonx.ai inference endpoint]
-4. [e.g., Anomaly scores are stored in PostgreSQL]
-5. [e.g., The React dashboard polls the API every 30 seconds to refresh]
+### ML Layer
 
-## Security Considerations
+| Component       | File              | Purpose                                        |
+|-----------------|-------------------|------------------------------------------------|
+| Trainer         | `train_model.py`  | Trains and evaluates a RandomForestClassifier  |
+| Saved Model     | `failure_model.joblib` | Serialised model for inference            |
 
-[Note any security decisions relevant to the architecture — even if basic.]
+The model uses scikit-learn exclusively. No custom ML code is written -- training,
+evaluation, and serialisation all use library calls.
 
-- [e.g., API keys stored in environment variables, never committed to git]
-- [e.g., All API routes require a Bearer token]
-- [e.g., Database credentials rotated via IBM Secrets Manager]
+### Application Layer
 
-## Scalability Notes
+| Component            | File     | Purpose                                       |
+|----------------------|----------|-----------------------------------------------|
+| Streamlit Dashboard  | `app.py` | Interactive UI with three tabbed views        |
 
-[Optional: how would this scale beyond the hackathon prototype?]
+The dashboard loads the CSV and model at startup (cached), computes per-asset
+failure probabilities, and presents readiness scores, a failure chart, and a
+prioritised maintenance plan with explainability.
 
-[e.g., "The FastAPI backend is stateless and could be horizontally scaled behind a load balancer. The watsonx.ai calls are the bottleneck and would benefit from request batching."]
+### Dev Tooling
+
+IBM Bob (Antigravity) is shown with dashed arrows because it is a development-
+time dependency, not a runtime one. Bob was used in Agent mode to write every
+source file and in Plan mode to design the architecture before implementation.

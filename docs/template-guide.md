@@ -45,7 +45,7 @@ The template gives every team a consistent, well-structured repository so that:
 1. Go to **[github.com/drijesh-ppatel/bob-ai-hackathon-submission-template](https://github.com/drijesh-ppatel/bob-ai-hackathon-submission-template)**
 2. Click the green **"Use this template"** button → **"Create a new repository"**
 
-   > ⚠️ Use **"Use this template"**, not "Fork". A fork shows as derived from the
+   >  Use **"Use this template"**, not "Fork". A fork shows as derived from the
    > template in GitHub's UI and carries unnecessary history. The template button
    > gives you a clean, independent repo.
 
@@ -71,7 +71,7 @@ git commit -m "feat: initial submission"
 git push
 ```
 
-Then go to your repo → **Actions** tab → confirm **✅ Validate Submission** is green.
+Then go to your repo → **Actions** tab → confirm ** Validate Submission** is green.
 
 ### Step 5 — Submit your repo URL via the entry form
 
@@ -173,7 +173,7 @@ Key sections to fill:
 | **Known Limitations** | Honest gaps — judges appreciate transparency |
 | **What We're Most Proud Of** | Direct judges to your strongest work |
 
-> ✅ Before submitting, search the README for `[` — any remaining brackets mean
+>  Before submitting, search the README for `[` — any remaining brackets mean
 > you missed a placeholder.
 
 ---
@@ -224,7 +224,7 @@ never seen your repo. Include:
 - How to verify it's working
 - A troubleshooting table for common errors
 
-> ✅ Test your own setup guide on a clean machine or fresh terminal before submitting.
+>  Test your own setup guide on a clean machine or fresh terminal before submitting.
 
 ---
 
@@ -304,10 +304,10 @@ Every push to your repo triggers the **Validate Submission** GitHub Action
 1. Go to your repo on GitHub
 2. Click the **Actions** tab
 3. Look for the most recent **Validate Submission** run
-4. ✅ green = submission is structurally complete
-5. ❌ red = click the run, read the error, fix it, push again
+4.  green = submission is structurally complete
+5.  red = click the run, read the error, fix it, push again
 
-> ⚠️ Do not modify `.github/workflows/validate.yml` — it will be ignored if changed.
+>  Do not modify `.github/workflows/validate.yml` — it will be ignored if changed.
 
 ---
 
@@ -330,7 +330,7 @@ Work through this before clicking submit:
 **Technical**
 - [ ] No `.env` files committed (check `git log` if unsure)
 - [ ] No `node_modules/`, `.venv/`, or build artefacts committed
-- [ ] GitHub Actions **✅ Validate Submission** is green
+- [ ] GitHub Actions ** Validate Submission** is green
 - [ ] Repository is **Public**
 
 **Submission**

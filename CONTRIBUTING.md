@@ -72,7 +72,7 @@ Every push to your repository triggers the **Validate Submission** GitHub Action
 To check manually:
 1. Go to your repo on GitHub
 2. Click the **Actions** tab
-3. Look for **✅ Validate Submission**
+3. Look for ** Validate Submission**
 4. A green checkmark means your submission is structurally complete
 5. A red X means something is missing — click the run to see what
 
@@ -96,7 +96,7 @@ Once validation passes:
 
 3. **Deadline:** `[ORGANIZER: INSERT DEADLINE HERE]`
 
-> ⚠️ Submissions after the deadline will not be reviewed.
+>  Submissions after the deadline will not be reviewed.
 > Changes after the deadline are not considered — make sure everything is complete before submitting.
 
 ---
@@ -110,7 +110,7 @@ Once validation passes:
 - [ ] `demo/demo-video-link.txt` — real video URL (3–5 min showing the app working)
 - [ ] `demo/screenshots/` — at least 3 screenshots of the running application
 - [ ] `presentation/slides.pdf` — slide deck present
-- [ ] GitHub Actions **✅ Validate Submission** is green
+- [ ] GitHub Actions ** Validate Submission** is green
 - [ ] Repository is **Public**
 - [ ] Entry form submitted before the deadline
 

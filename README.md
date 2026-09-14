@@ -1,121 +1,141 @@
-# 🚀 [Your Project Title Here]
+# Mission Readiness and Predictive Maintenance Copilot
 
-> ⚠️ **Replace everything in `[ ]` brackets with your actual content before submission.**
-
----
-
-## 👥 Team
-
-| Field | Value |
-|---|---|
-| **Team Name** | [Your Team Name] |
-| **Track** | [AI / DevOps / Sustainability / Open] |
-| **Team Lead** | [Name] — [email@ibm.com] |
-| **Members** | [Name 1], [Name 2], [Name 3] |
+**Team Galcogens** -- IBM BoB AI Innovation Hackathon 2026
 
 ---
 
-## 🎯 Problem Statement
+## Problem Statement
 
-> In 2–3 sentences: What problem does your project solve? Who experiences this problem?
+**D1 - Mission Readiness and Predictive Maintenance**
 
-[Describe the real-world problem your project addresses. Be specific about who the user is and what pain point they face.]
+Military organisations cannot reliably determine whether aircraft, vehicles, and
+equipment are mission-ready. Maintenance runs on fixed calendar schedules instead
+of actual condition. Health and Usage Monitoring System (HUMS) sensor data that
+could predict failures weeks in advance goes unanalysed.
 
----
+## Solution
 
-## 💡 Solution
+An AI-driven copilot that:
 
-> In 2–3 sentences: What did you build? How does it solve the problem above?
+1. Ingests HUMS sensor telemetry (vibration, temperature, oil pressure) and
+   service records.
+2. Computes a readiness score for every asset using a trained failure-risk model.
+3. Predicts which components are likely to fail within a 30-day window.
+4. Generates a prioritised maintenance plan, explaining why each asset was
+   flagged, so logistics planners can act before a mission is compromised.
 
-[Describe your solution clearly. Explain the core mechanism — what makes it work.]
+## Key Features
 
----
+- Synthetic but realistic HUMS dataset with injected failure patterns.
+- Explainable RandomForest classifier with per-asset feature importance
+  breakdowns.
+- Interactive Streamlit dashboard with three views: readiness scores, failure
+  predictions, and a prioritised maintenance plan.
+- Minimal, readable codebase -- every function delegates to pandas, numpy, or
+  scikit-learn instead of hand-rolled logic.
 
-## ✨ Key Features
+## Tech Stack
 
-- **Feature 1:** [Brief description — e.g., "Real-time anomaly detection using watsonx.ai"]
-- **Feature 2:** [Brief description]
-- **Feature 3:** [Brief description]
-- **Feature 4:** [Optional]
-- **Feature 5:** [Optional]
+| Layer          | Technology                          |
+|----------------|-------------------------------------|
+| Language       | Python 3.11                         |
+| Data           | pandas, numpy                       |
+| ML             | scikit-learn (RandomForestClassifier)|
+| Dashboard      | Streamlit, matplotlib               |
+| AI Dev Partner | IBM Bob (Antigravity)               |
 
----
-
-## 🛠️ Tech Stack
-
-| Category | Technologies |
-|---|---|
-| **Languages** | [e.g., Python, TypeScript] |
-| **Frameworks** | [e.g., FastAPI, React] |
-| **IBM Technologies** | [e.g., watsonx.ai, IBM Bob, IBM Cloud] |
-| **Databases** | [e.g., PostgreSQL, Redis] |
-| **Other** | [e.g., Docker, GitHub Actions] |
-
----
-
-## 📁 Repository Structure
-
-```
-├── src/                  # All source code
-├── docs/                 # Written documentation
-│   ├── problem-statement.md
-│   ├── solution-overview.md
-│   ├── architecture.md
-│   └── setup-guide.md
-├── demo/                 # Demo artifacts
-│   ├── screenshots/      # App screenshots
-│   └── demo-video-link.txt  # Link to demo video
-├── presentation/         # Slide deck
-└── submission.yaml       # Structured submission metadata
-```
-
----
-
-## ⚡ How to Run
-
-> **Copy these exact steps from your [`docs/setup-guide.md`](docs/setup-guide.md)**
+## How to Run
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/[your-repo].git
-cd [your-repo]
+# 1. Clone the repository
+git clone https://github.com/kunjcr2/bob-ai-hackathon-Galcogens.git
+cd bob-ai-hackathon-Galcogens
 
-# 2. Install dependencies
-[your install command here]
+# 2. Create a virtual environment and install dependencies
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # macOS / Linux
+pip install -r src/requirements.txt
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your values
+# 3. Generate the synthetic dataset
+python src/generate_data.py
 
-# 4. Run the project
-[your run command here]
+# 4. Train the failure-prediction model
+python src/train_model.py
+
+# 5. Launch the dashboard
+streamlit run src/app.py
 ```
 
+See [docs/setup-guide.md](docs/setup-guide.md) for detailed instructions.
+
+## Demo
+
+- **Video**: see [demo/demo-video-link.txt](demo/demo-video-link.txt)
+- **Screenshots**: see [demo/screenshots/](demo/screenshots/)
+- **Live URL**: NOT DEPLOYED
+
+## IBM Bob Integration
+
+IBM Bob was not just mentioned -- it was the primary development partner for this
+project:
+
+- **Agent mode** scaffolded the entire data pipeline, model training script, and
+  Streamlit dashboard.
+- **Plan mode** designed the feature engineering strategy and architecture before
+  any code was written.
+- The architecture diagram in [docs/architecture.md](docs/architecture.md) was
+  generated through Bob.
+- The per-asset explainability layer (feature importances surfaced in the
+  maintenance plan) was designed through iterative Bob prompts.
+- Every source file was written, reviewed, and refined inside the Bob IDE.
+
+## Known Limitations
+
+- The dataset is synthetic; real HUMS data would require domain-specific
+  calibration of thresholds and sensor ranges.
+- The model is a single RandomForest classifier; a production system would
+  benefit from time-series models and ensemble approaches.
+- No authentication or role-based access control on the dashboard.
+- Not deployed to a live URL for this submission round.
+
+## Strongest Work
+
+The tightest part of this submission is the end-to-end pipeline from raw sensor
+data to an actionable, explained maintenance plan -- delivered in under 300
+total lines of Python. Every prediction comes with a human-readable explanation
+of which sensor readings drove the risk score, making the system trustworthy
+for a logistics planner who needs to justify maintenance decisions.
+
 ---
 
-## 🖥️ Demo
+## Repository Structure
 
-| Artifact | Link |
-|---|---|
-| 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
-| 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
-| 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/slides.pdf](presentation/) |
-
----
-
-## ⚠️ Known Limitations
-
-> Be honest — judges appreciate transparency over overclaiming.
-
-- [Limitation 1: e.g., "Authentication is mocked — not production-ready"]
-- [Limitation 2: e.g., "Only tested on Chrome"]
-- [Limitation 3: e.g., "Feature X is scaffolded but not fully implemented"]
-
----
-
-## 🏅 What We're Most Proud Of
-
-[Tell the judges what part of your submission is strongest and worth paying close attention to.]
-
----
+```
+submission.yaml          Structured metadata for evaluators
+README.md                This file
+CONTRIBUTING.md          Contribution guidelines (template)
+src/
+  generate_data.py       Synthetic HUMS dataset generator
+  train_model.py         Model training and evaluation
+  app.py                 Streamlit dashboard
+  requirements.txt       Python dependencies
+  .env.example           Environment variable template
+data/
+  hums_sensor_data.csv   Generated sensor dataset
+models/
+  failure_model.joblib   Trained model artifact
+docs/
+  problem-statement.md   Problem context and audience
+  solution-overview.md   Conceptual solution walkthrough
+  architecture.md        Architecture diagram and explanation
+  setup-guide.md         Step-by-step setup instructions
+demo/
+  demo-video-link.txt    Demo video URL
+  live-demo-url.txt      Deployment URL or NOT DEPLOYED
+  screenshots/           Dashboard screenshots
+presentation/
+  slides-placeholder.txt Placeholder for slides.pdf or slides.pptx
+.github/workflows/
+  validate.yml           Automated validator (do not modify)
+```
