@@ -11,7 +11,7 @@
 | **Team Name** | Galcogens |
 | **Track** | AI |
 | **Team Lead** | Kunj — d24aiml082@charusat.edu.in |
-| **Members** | Vedant (23aiml042@charusat.edu.in), Path (23aiml055@charusat.edu.in), Venisha (23dcs134@charusat.edu.in) |
+| **Members** | Vedant (23aiml042@charusat.edu.in), Parth (23aiml055@charusat.edu.in), Venisha (23dcs134@charusat.edu.in) |
 
 ---
 
@@ -25,21 +25,24 @@ Military organizations cannot reliably determine whether aircraft, vehicles, and
 
 We built the **D1 Mission Readiness & Predictive Maintenance Copilot**, a modular monolithic platform with an embedded **IBM Bob Copilot**. The system ingests HUMS sensor telemetry and historical service records to classify fleet readiness into military-standard **FMC** (Fully Mission Capable), **PMC** (Partially Mission Capable), and **NMC** (Non-Mission Capable) states. 
 
-It predicts component Remaining Useful Life (RUL) using GPU-accelerated XGBoost models trained on the **NASA C-MAPSS** aerospace turbofan degradation benchmark (achieving an holdout RMSE of **18.21 cycles**). It connects to **IBM watsonx.ai Granite 3-8B** to explain root-cause degradation in natural language and recommends an optimized, prioritized maintenance turnaround plan to guarantee fleet readiness before upcoming mission launch deadlines.
+It predicts component Remaining Useful Life (RUL) using GPU-accelerated XGBoost models trained on the **NASA C-MAPSS** aerospace turbofan degradation benchmark (achieving a verified holdout RMSE of **18.21 cycles**, MAE of **12.75 cycles**, $R^2 = 0.7935$). It connects to **IBM watsonx.ai Granite 3-8B** to explain root-cause degradation in natural language and recommends an optimized, prioritized maintenance turnaround plan to guarantee fleet readiness before upcoming mission launch deadlines.
 
 ---
 
-## ✨ Key Features & Breakthrough Innovations
+## ✨ Key Features & Tactical Modules
 
-- **What-If Mission Stress & Environmental Digital Twin:** Counterfactual simulation engine evaluating operational degradation under harsh operational theaters (Desert Heat 45°C, Sand/Dust particulate ingestion, Sub-Zero Arctic, and 9G combat air maneuvering) to forecast accelerated wear multipliers and mission survivability probability before platform commitment.
-- **Mission-Adaptive Sortie Re-allocation Matrix:** Dynamic Air Tasking Order (ATO) matching engine. Instead of binary platform grounding (NMC), the engine dynamically matches degraded airframes (PMC) to secondary low-stress sortie profiles (Combat Air Patrol vs Close Air Support vs High-Altitude Reconnaissance vs Tactical Ferry), preserving combat generation tempo and saving critical sorties.
-- **Automated Digital AFTO Form 781A Discrepancy Generator:** Digital compliance with Air Force Technical Order 00-20-1 and DA Form 2404. Automatically dispatches official maintenance discrepancy sheets with Red X grounding / Red Diagonal symbols, automated Job Control Numbers (JCN), military J-codes, and Federal Defense Logistics Agency (DLA) National Stock Number (NSN) parts manifests.
-- **GPU-Accelerated RUL Prognostics (18.21 Cycles RMSE):** High-precision Remaining Useful Life regression trained on NASA C-MAPSS turbofan data across 108 engineered condition telemetry features with rolling exponential statistics.
-- **Condition-Based FMC / PMC / NMC Readiness Engine:** Evaluates multi-subsystem airworthiness (propulsion, gearboxes, hydraulics, radar) against mission deployment horizons.
-- **IBM Bob Copilot Integration via FastMCP:** Official Model Context Protocol (MCP) server at `/mcp` exposing 11 autonomous defense tools for real-time querying, mission stress testing, diagnostic investigations, and work order generation.
-- **watsonx.ai Granite 3-8B Natural Language Diagnostics:** Delivers plain-language root cause explanations for thermal creep, vibration anomalies, and failure mechanisms with an intelligent dual-mode fallback.
-- **Mission-Aware Maintenance Optimizer:** Ranks and schedules work orders by: $\text{Priority} = f(\text{Mission Criticality}, \text{Predicted RUL}, \text{Technician Availability})$ to eliminate preventable mission aborts.
-- **Tactical Command Dashboard (Pure JSX):** Dark-mode command center displaying fleet readiness donut gauges, asset diagnostic cards, interactive mission stress simulator, official AFTO Form 781A viewer, prognostics timeline, and live Copilot chat.
+1. **Tactical Command Dashboard (`DashboardOverview.jsx`):** High-contrast executive command center with fleet readiness gauges (FMC/PMC/NMC), live telemetry activity strips, shortfall alerts across active sortie horizons, and immediate triage of grounded airframes.
+2. **Fleet Operations Center (`FleetView.jsx`):** Interactive platform inventory grid with multi-squadron filtering, status inspection drawers, airworthiness scores, flight hours, and cycle counts.
+3. **Condition-Based Readiness Engine (`ReadinessEngineView.jsx`):** Subsystem-to-platform MIL-STD readiness matrix (Propulsion, Gearbox, Hydraulics, Avionics, Radar) with weighted degradation scoring.
+4. **GPU-Accelerated RUL Prognostics (`RULPrognosticsView.jsx`):** Remaining Useful Life regression trained on NASA C-MAPSS turbofan data across 108 engineered condition features with 95% confidence bounds (RMSE 18.21 cycles).
+5. **Mission-Aware Maintenance Optimizer (`MaintenanceOptimizerView.jsx`):** Turnaround work orders ranked dynamically by: $\text{Priority} = f(\text{Mission Criticality}, \text{Predicted RUL}, \text{Technician Availability})$ with one-click authorization workflows.
+6. **Air Tasking Order (ATO) Sortie Tracker (`MissionsView.jsx`):** Mission readiness monitor matching upcoming deployment windows against capable platforms, identifying asset shortfalls before sortie launch.
+7. **What-If Mission Stress & Environmental Twin (`StressSimulatorView.jsx`):** Counterfactual simulation engine evaluating operational degradation under harsh operational theaters (Desert Heat 45°C, Sand/Dust particulate ingestion, Sub-Zero Arctic, and 9G combat air maneuvering) to forecast accelerated wear multipliers ($K_{env}$) and mission survivability probability.
+8. **Automated Digital AFTO Form 781A & ATO Matrix (`MilFormsView.jsx`):** Digital compliance with Air Force Technical Order 00-20-1 and DA Form 2404. Automatically dispatches official discrepancy sheets with Red X grounding / Red Diagonal symbols, automated Job Control Numbers (JCN), military J-codes, and DLA National Stock Number (NSN) parts manifests, combined with dynamic ATO sortie re-allocation to save degraded airframes from binary grounding.
+9. **watsonx.ai Granite 3-8B Diagnostics (`GraniteDiagnosticsView.jsx`):** Plain-language root cause explanations for thermal creep, vibration anomalies, and failure mechanisms with an intelligent dual-mode fallback.
+10. **IBM Bob FastMCP Copilot Drawer (`CopilotChatDrawer.jsx`):** Autonomous conversational assistant connected via the Model Context Protocol (FastMCP at `/mcp`), exposing 11 defense tools for multi-turn operational investigations.
+11. **Defense CAC / DoD ID Authentication (`LoginPage.jsx`):** Role-Based Access Control simulating Common Access Card (CAC) authentication across 4 defense roles (Commander, Maintenance Officer, Logistics Planner, Lead Technician).
+12. **Public Mission Showcase (`LandingPage.jsx`):** Operational architecture overview highlighting CBM+ metrics, live telemetry strip, and Granite intelligence capabilities.
 
 ---
 

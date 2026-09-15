@@ -89,12 +89,11 @@ yq '.' submission.yaml   # checks YAML is valid
 Once validation passes:
 
 1. Copy your repository URL:
-   `https://github.com/[your-org]/bob-ai-hackathon-[your-team-name]`
+   `https://github.com/kunj290506/bob-ai-hackathon-galcogens`
 
-2. Submit it via the **official entry form** at:
-   `[ORGANIZER: INSERT FORM URL HERE]`
+2. Submit it via the **official hackathon submission portal**.
 
-3. **Deadline:** `[ORGANIZER: INSERT DEADLINE HERE]`
+3. **Status:** Ready for final evaluation.
 
 > ⚠️ Submissions after the deadline will not be reviewed.
 > Changes after the deadline are not considered — make sure everything is complete before submitting.

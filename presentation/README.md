@@ -1,30 +1,25 @@
-# Presentation
+# Presentation Deck — D1 Mission Readiness Copilot
 
-Place your slide deck in this folder.
+This folder contains the official presentation slide deck for the **D1 Mission Readiness & Predictive Maintenance Copilot**, submitted by **Team Galcogens** for the **Bob AI Innovation Hackathon (Track: AI)**.
 
-## Accepted Formats
+- **Primary Deck**: [`slides.pdf`](slides.pdf) (12 Slides, High-Resolution PDF)
 
-  slides.pdf      ← Preferred (universally viewable)
-  slides.pptx     ← Acceptable
-  slides.key      ← Acceptable (macOS Keynote)
+---
 
-Rename your file to `slides.pdf` (or `slides.pptx`) so the evaluation
-pipeline can locate it reliably.
+## Slide Deck Overview
 
-## Recommended Slide Structure (5–8 slides)
+| Slide | Title | Core Content & Narrative |
+|---|---|---|
+| **01** | **Title Slide** | Project: D1 Mission Readiness & Predictive Maintenance Copilot · Team Galcogens · Track: AI · Platform: IBM Bob, watsonx.ai Granite 3-8B, FastMCP. |
+| **02** | **Executive Problem Statement** | Military organizations cannot determine real mission readiness. Fixed calendar schedules cause unexpected failures in 50%+ of critical missions. $90B/year DoD maintenance spend. |
+| **03** | **The Data Paradox** | Gigabytes of onboard HUMS telemetry (temperatures, vibrations, pressures) sit unanalyzed in silos while platforms are grounded for weeks. |
+| **04** | **Solution Vision & Core Architecture** | End-to-end modular monolith: Ingestion $\rightarrow$ XGBoost GPU Prognostics $\rightarrow$ Readiness Scoring $\rightarrow$ IBM Bob FastMCP Copilot $\rightarrow$ watsonx.ai Granite 3-8B. |
+| **05** | **Propulsion Physics & NASA C-MAPSS ML** | GPU-accelerated XGBoost regressor trained on NASA C-MAPSS FD001 benchmark (108 engineered features). Verified holdout RMSE of **18.21 cycles**, MAE **12.75 cycles**, $R^2 = 0.7935$. |
+| **06** | **What-If Mission Stress Simulator** | Counterfactual digital twin modeling harsh combat environments (Desert Heat 45°C, Sand/Dust Ingestion, Sub-Zero Arctic, 9G Combat Turns) to compute wear multipliers ($K_{env}$) and survivability probability. |
+| **07** | **Mission-Adaptive Sortie Re-allocation** | Dynamic Air Tasking Order (ATO) matching engine that re-allocates degraded platforms (PMC) to secondary low-stress sorties (Combat Air Patrol vs ISR Recon vs Ferry), eliminating lost combat tempo. |
+| **08** | **Digital AFTO Form 781A Compliance** | Automated defense discrepancy sheet generation with military Red X / Red Diagonal symbols, automated Job Control Numbers (JCN), military J-codes, and DLA NSN parts requisitions. |
+| **09** | **Deep IBM Bob FastMCP Integration** | FastMCP server at `/mcp` exposing 11 autonomous tools for fleet summary, asset diagnostics, what-if stress tests, work order generation, and maintenance history search. |
+| **10** | **IBM watsonx.ai Granite Intelligence** | Plain-language diagnostic reasoning with `ibm/granite-3-8b-instruct`. Intelligent dual-mode engine guaranteeing crash-free execution in air-gapped / keyless test environments. |
+| **11** | **Operational Impact & Metrics** | 40% reduction in unplanned in-field failures, 20% reduction in MTTR, sustaining $\ge 85\%$ fleet FMC readiness rate, saving millions in emergency recovery logistics. |
+| **12** | **Team Galcogens Credentials** | Team roles, responsibilities, and institutional contacts (Kunj, Vedant, Parth, Venisha — CHARUSAT). |
 
-  Slide 1: Title — Project name, team name, track
-  Slide 2: Problem — What problem? Who has it? Why does it matter?
-  Slide 3: Solution — What you built in one clear diagram or screenshot
-  Slide 4: Architecture — How the system works technically
-  Slide 5: Demo / Key Feature — Screenshot or flow of your best feature
-  Slide 6: IBM Technologies — Specifically how you used them
-  Slide 7: Results / Impact — What does success look like? Any metrics?
-  Slide 8: Team — Names, roles, what each person built
-
-## Tips
-
-- Keep slides visual — diagrams beat bullet points
-- One idea per slide
-- Font size minimum 24pt for readability
-- Do not paste large code blocks into slides — reference the repo instead
