@@ -368,10 +368,16 @@ class WatsonxService:
         # ── Out-of-Scope Domain Boundary Notice ─────────────────────────────
         out_of_scope_keywords = [
             "cookie", "recipe", "super bowl", "football", "basketball", "baseball",
-            "weather in", "movie", "song", "joke", "celebrity", "president", "stock market",
-            "bitcoin", "crypto", "dating", "horoscope"
+            "cricket", "soccer", "tennis", "weather in", "movie", "song", "joke",
+            "celebrity", "president", "prime minister", "modi", "biden", "trump",
+            "politician", "politics", "stock market", "bitcoin", "crypto", "dating", "horoscope"
         ]
-        if any(kw in query_lower for kw in out_of_scope_keywords):
+        is_general_who = (
+            query_lower.startswith("who is ") and not any(
+                role in query_lower for role in ["technician", "pilot", "assigned", "working", "officer", "commander", "lead", "engineer", "mechanic"]
+            )
+        )
+        if any(kw in query_lower for kw in out_of_scope_keywords) or is_general_who:
             return (
                 "**[OPERATIONAL DOMAIN NOTICE]**\n\n"
                 "I am **Bob**, the D1 Mission Readiness & Condition-Based Predictive Maintenance Copilot. "
@@ -379,6 +385,31 @@ class WatsonxService:
                 "Remaining Useful Life (RUL) prognostics, maintenance work orders, and Air Tasking Order (ATO) sortie matching.\n\n"
                 "I cannot assist with queries outside defense fleet operations. "
                 "Please query me regarding fleet airworthiness (FMC/PMC/NMC), platform diagnostics, or upcoming mission windows."
+            )
+
+        # ── Intent: Greetings / Casual Openings ─────────────────────────────
+        elif any(
+            query_lower.strip() == g or query_lower.startswith(f"{g} ") or query_lower.startswith(f"{g},") or query_lower.startswith(f"{g}!")
+            for g in ["hello", "hi", "hey", "wassup", "what's up", "whats up", "greetings", "good morning", "good afternoon", "good evening", "howdy"]
+        ):
+            return (
+                f"**Greetings, Commander.** I am **Bob**, your autonomous D1 Mission Readiness & Condition-Based Predictive Maintenance Copilot.\n\n"
+                f"I am actively monitoring **{total} military platforms** across active combat squadrons. "
+                f"Current fleet posture: **{rate:.1f}% FMC** ({fmc_cnt} FMC / {pmc_cnt} PMC / {nmc_cnt} NMC) with an average readiness health index of **{avg_score:.1f}/100**.\n\n"
+                f"You can ask me to evaluate mission readiness, predict imminent component failures (RUL), "
+                f"generate prioritized AFTO Form 781A work orders, or analyze specific aircraft diagnostics."
+            )
+
+        # ── Intent: Identity / Capabilities / Active Duties ─────────────────
+        elif any(kw in query_lower for kw in ["what are you doing", "what do you do", "who are you", "what can you do", "introduce yourself", "your capabilities", "your role"]):
+            return (
+                "**Operational Status & Capabilities - IBM Bob Copilot:**\n\n"
+                f"I am actively operating as the **D1 Mission Readiness & CBM+ Copilot** for defense fleet command, continuously executing four core capabilities:\n\n"
+                "1. **Fleet Readiness Tracking:** Real-time classification of platforms into FMC (Fully Mission Capable), PMC (Partially Mission Capable), and NMC (Non-Mission Capable) per DoD military readiness standards.\n"
+                "2. **Predictive Failure Prognostics:** Machine learning (NASA C-MAPSS trained XGBoost/Weibull) estimating Remaining Useful Life (RUL) on critical aircraft subsystems (turbofans, APUs, hydraulic actuators, avionics).\n"
+                "3. **MIL-STD-3008 Turnaround Planning:** Automated generation and scheduling of digital AFTO Form 781A discrepancy work orders with Red X / Red Diagonal symbols and NSN parts requisitions.\n"
+                "4. **Air Tasking Order (ATO) Matching:** Physics-informed sortie reallocation and mission stress simulation (ambient temperature, dust ingestion, 9G turns) to safeguard degraded aircraft.\n\n"
+                f"Currently tracking **{total} platforms** at **{rate:.1f}% FMC** readiness. How would you like to proceed, Commander?"
             )
 
         # ── Intent: PMC platforms ────────────────────────────────────────────
