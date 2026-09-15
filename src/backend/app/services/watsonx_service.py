@@ -1,4 +1,4 @@
-﻿"""
+"""
 IBM watsonx.ai Integration Service with Intelligent Dual-Mode Execution.
 Connects to live IBM Granite 3-8B Instruct when credentials are provided,
 and seamlessly switches to an offline deterministic military domain synthesis engine
@@ -146,7 +146,7 @@ class WatsonxService:
             f"Fleet Status: Total Assets: {fleet_summary.get('total_assets')}, FMC: {fleet_summary.get('fmc_count')}, "
             f"PMC: {fleet_summary.get('pmc_count')}, NMC: {fleet_summary.get('nmc_count')}, "
             f"Readiness Rate: {fleet_summary.get('fmc_percentage')}%\n"
-            f"Missions: {json.dumps(active_missions)}\n"
+            f"Missions: {json.dumps(active_missions, default=str)}\n"
             f"Provide a concise executive morning briefing to the Wing Commander.\n<|assistant|>\n"
         )
 
@@ -167,7 +167,7 @@ class WatsonxService:
             mission_str = f"Priority Mission: **{m.get('title')}** launching in {(m.get('start_time') - m.get('start_time')).total_seconds() if False else 48} hours requiring {m.get('required_assets_count')} ready platforms."
 
         return (
-            f"## 🎖️ COMMANDER'S DAILY READINESS BRIEFING\n\n"
+            f"## ??? COMMANDER'S DAILY READINESS BRIEFING\n\n"
             f"**Fleet Status Overview:**\n"
             f"- **Overall Readiness:** **{rate:.1f}%** ({fmc}/{total} Fully Mission Capable)\n"
             f"- **Degraded/PMC:** {pmc} platforms with secondary system limitations\n"
