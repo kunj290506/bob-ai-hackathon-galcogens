@@ -8,11 +8,11 @@
 :root,
 [data-theme="dark"] {
   --bg-base:       #000000;
-  --bg-surface:    #111111;
-  --bg-elevated:   #181818;
-  --bg-card:       #181818;
-  --bg-glass:      #202020;
-  --bg-glass-hover:#2A2A2A;
+  --bg-surface:    #000000;
+  --bg-elevated:   #000000;
+  --bg-card:       #000000;
+  --bg-glass:      #0A0A0A;
+  --bg-glass-hover:#111111;
 
   --border:        #2A2A2A;
   --border-strong: #494949;
@@ -276,11 +276,11 @@ input[type="range"]::-webkit-slider-thumb:hover { background: var(--gold-hover);
 .gold-rule { width: 48px; height: 3px; background: var(--gold); border-radius: 2px; }
 
 .feature-card {
-  background: #181818; border: 1px solid var(--border);
+  background: #000000; border: 1px solid var(--border);
   border-radius: 12px; padding: 28px 24px;
   transition: border-color 0.25s, background 0.25s;
 }
-.feature-card:hover { border-color: var(--gold); background: #202020; }
+.feature-card:hover { border-color: var(--gold); background: #0A0A0A; }
 
 .stack-pill {
   padding: 6px 16px; background: var(--bg-glass); border: 1px solid var(--border);

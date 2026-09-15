@@ -12,14 +12,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 1. Fleet FMC Rate Card */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'FMC' ? null : 'FMC')}
-        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`bg-black border border-[#2A2A2A] rounded-xl p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'FMC' 
             ? 'ring-1 ring-blue-500 border-blue-500/80' 
-            : 'hover:border-slate-700'
+            : 'hover:border-[#494949]'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-[#7D7D7D]">
             FLEET READINESS INDEX
           </span>
           <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
@@ -34,7 +34,7 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
           </span>
         </div>
 
-        <div className="mt-3 w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
+        <div className="mt-3 w-full bg-[#111111] rounded-full h-1.5 overflow-hidden border border-[#2A2A2A]">
           <div 
             className="bg-emerald-500 h-full rounded-full transition-all duration-700" 
             style={{ width: `${fmcPct}%` }}
@@ -45,14 +45,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 2. Fully Mission Capable (FMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'FMC' ? null : 'FMC')}
-        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`bg-black border border-[#2A2A2A] rounded-xl p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'FMC' 
             ? 'ring-1 ring-emerald-500 border-emerald-500/80' 
-            : 'hover:border-slate-700'
+            : 'hover:border-[#494949]'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-[#7D7D7D]">
             FULLY MISSION CAPABLE
           </span>
           <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -62,9 +62,9 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
 
         <div className="flex items-baseline space-x-2">
           <span className="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight">{fmc}</span>
-          <span className="text-xs font-mono text-slate-400">Sortie-Ready</span>
+          <span className="text-xs font-mono text-[#7D7D7D]">Sortie-Ready</span>
         </div>
-        <p className="text-[11px] text-slate-400 mt-2 font-sans">
+        <p className="text-[11px] text-[#7D7D7D] mt-2 font-sans">
           All primary combat avionics and propulsion verified nominal.
         </p>
       </div>
@@ -72,14 +72,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 3. Partially Mission Capable (PMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'PMC' ? null : 'PMC')}
-        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`bg-black border border-[#2A2A2A] rounded-xl p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'PMC' 
             ? 'ring-1 ring-amber-500 border-amber-500/80' 
-            : 'hover:border-slate-700'
+            : 'hover:border-[#494949]'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-[#7D7D7D]">
             PARTIALLY MISSION CAPABLE
           </span>
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
@@ -89,9 +89,9 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
 
         <div className="flex items-baseline space-x-2">
           <span className="text-3xl font-extrabold text-amber-400 font-mono tracking-tight">{pmc}</span>
-          <span className="text-xs font-mono text-slate-400">Secondary Degradation</span>
+          <span className="text-xs font-mono text-[#7D7D7D]">Secondary Degradation</span>
         </div>
-        <p className="text-[11px] text-slate-400 mt-2 font-sans">
+        <p className="text-[11px] text-[#7D7D7D] mt-2 font-sans">
           Airframe restricted to secondary low-stress sortie envelopes.
         </p>
       </div>
@@ -99,14 +99,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 4. Non-Mission Capable (NMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'NMC' ? null : 'NMC')}
-        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`bg-black border border-[#2A2A2A] rounded-xl p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'NMC' 
             ? 'ring-1 ring-rose-500 border-rose-500/80' 
-            : 'hover:border-slate-700'
+            : 'hover:border-[#494949]'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-[#7D7D7D]">
             NON-MISSION CAPABLE
           </span>
           <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500">

@@ -125,7 +125,7 @@ function LiveMetricsStrip() {
     padding: '24px 28px',
     borderRight: '1px solid #494949',
     borderBottom: '1px solid #494949',
-    background: '#181818',
+    background: '#000000',
   }
 
   if (loading) return (
@@ -135,7 +135,7 @@ function LiveMetricsStrip() {
   )
 
   if (error) return (
-    <div style={{ padding: '32px', background: '#181818', border: '1px solid #494949', textAlign: 'center' }}>
+    <div style={{ padding: '32px', background: '#000000', border: '1px solid #494949', textAlign: 'center' }}>
       <p style={{ fontSize: 12, color: '#7D7D7D', fontFamily: 'JetBrains Mono, monospace' }}>
         CONNECT BACKEND TO VIEW LIVE FLEET METRICS
       </p>
@@ -214,7 +214,7 @@ export default function LandingPage({ onEnterDashboard }) {
 
       {/* Mobile nav drawer */}
       {mobileNavOpen && (
-        <div style={{ position: 'fixed', top: 56, left: 0, right: 0, zIndex: 49, background: '#181818', borderBottom: '1px solid #494949', padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ position: 'fixed', top: 56, left: 0, right: 0, zIndex: 49, background: '#000000', borderBottom: '1px solid #494949', padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {['problem', 'solution', 'features', 'stack', 'team'].map(id => (
             <button key={id} onClick={() => scrollTo(id)}
               style={{ textAlign: 'left', padding: '10px 0', background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#F5F5F5', borderBottom: '1px solid #2A2A2A' }}
@@ -270,7 +270,7 @@ export default function LandingPage({ onEnterDashboard }) {
                 { label: 'FastMCP: 11 Tools', status: 'CONNECTED', color: '#29ABE2' },
                 { label: 'NASA C-MAPSS', status: 'SEEDED', color: '#F59E0B' },
               ].map(s => (
-                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', background: '#181818', border: '1px solid #2A2A2A' }}>
+                <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 12px', background: '#000000', border: '1px solid #2A2A2A' }}>
                   <div className="hex-live" style={{ background: s.color }} />
                   <span style={{ fontSize: 10, color: '#969696', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.06em' }}>{s.label}</span>
                   <span style={{ fontSize: 10, color: s.color, fontFamily: 'JetBrains Mono, monospace', fontWeight: 700 }}>{s.status}</span>
@@ -288,7 +288,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── PROBLEM ── */}
-      <section id="problem" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#181818', borderTop: '1px solid #494949' }}>
+      <section id="problem" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#000000', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 16 }}>THE PROBLEM</p>
@@ -354,7 +354,7 @@ export default function LandingPage({ onEnterDashboard }) {
                 {PIPELINE_STEPS.map((step, i) => (
                   <React.Fragment key={step.n}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, flexShrink: 0, width: 90 }}>
-                      <div style={{ width: 36, height: 36, background: '#181818', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, color: '#FFC000', fontFamily: 'JetBrains Mono, monospace' }}>
+                      <div style={{ width: 36, height: 36, background: '#000000', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, color: '#FFC000', fontFamily: 'JetBrains Mono, monospace' }}>
                         {step.n}
                       </div>
                       <p style={{ fontSize: 10, color: '#969696', textAlign: 'center', lineHeight: 1.4, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.05em', textTransform: 'uppercase', whiteSpace: 'pre-line' }}>
@@ -430,7 +430,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── STACK ── */}
-      <section id="stack" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#181818', borderTop: '1px solid #494949' }}>
+      <section id="stack" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#000000', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 16 }}>TECHNOLOGY STACK</p>
@@ -461,7 +461,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── TEAM ── */}
-      <section id="team" style={{ padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,24px)', background: '#181818', borderTop: '1px solid #494949' }}>
+      <section id="team" style={{ padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,24px)', background: '#000000', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 8 }}>TEAM</p>
@@ -471,7 +471,7 @@ export default function LandingPage({ onEnterDashboard }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px,100%), 1fr))', gap: 0, borderLeft: '1px solid #494949', borderTop: '1px solid #494949' }}>
             {TEAM.map(m => (
               <div key={m.name} style={{ padding: '24px', borderRight: '1px solid #494949', borderBottom: '1px solid #494949' }}>
-                <div style={{ width: 36, height: 36, background: '#202020', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, fontSize: 13, fontWeight: 800, color: '#FFC000', fontFamily: 'JetBrains Mono, monospace' }}>
+                <div style={{ width: 36, height: 36, background: '#000000', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, fontSize: 13, fontWeight: 800, color: '#FFC000', fontFamily: 'JetBrains Mono, monospace' }}>
                   {m.name[0]}
                 </div>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{m.name}</p>
