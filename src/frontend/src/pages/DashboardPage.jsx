@@ -197,7 +197,7 @@ export default function DashboardPage({ onSignOut, onGoLanding }) {
       </aside>
 
       {/* ── MAIN ── */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', marginLeft: 220 }} className="dash-main">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', marginLeft: 'var(--sidebar-w, 220px)' }} className="dash-main">
         {/* Top bar */}
         <div className="dash-topbar" style={{ justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

@@ -189,7 +189,7 @@ export default function LandingPage({ onEnterDashboard }) {
             <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff' }}>D1 Mission Readiness</span>
             <span className="dev-banner" style={{ marginLeft: 8 }}>GALCOGENS · AI TRACK</span>
           </div>
-          <div className="hidden md:flex" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div className="landing-nav-links hidden md:flex" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {['problem', 'solution', 'features', 'stack', 'team'].map(id => (
               <button key={id} onClick={() => scrollTo(id)}
                 style={{ padding: '6px 12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7D7D7D', transition: 'color 0.2s' }}
@@ -203,7 +203,7 @@ export default function LandingPage({ onEnterDashboard }) {
           </div>
           <button
             style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: '#7D7D7D' }}
-            className="md-hidden mobile-menu-btn"
+            className="landing-nav-mobile-btn"
             onClick={() => setMobileNavOpen(v => !v)}
             aria-label="Toggle navigation"
           >
@@ -227,7 +227,7 @@ export default function LandingPage({ onEnterDashboard }) {
       )}
 
       {/* ── HERO ── */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px 24px 48px', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(72px,10vw,80px) clamp(16px,4vw,24px) 48px', position: 'relative', overflow: 'hidden' }}>
         <div className="hero-grid-bg" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
 
         {/* Gold slash accent */}
@@ -288,20 +288,20 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── PROBLEM ── */}
-      <section id="problem" style={{ padding: '100px 24px', background: '#181818', borderTop: '1px solid #494949' }}>
+      <section id="problem" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#181818', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 16 }}>THE PROBLEM</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 0, border: '1px solid #494949' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px,100%), 1fr))', gap: 0, border: '1px solid #494949' }}>
             {/* Big stat */}
-            <div style={{ padding: '48px 40px', borderRight: '1px solid #494949' }}>
-              <p style={{ fontSize: 72, fontWeight: 900, color: '#FFC000', lineHeight: 1, fontFamily: 'JetBrains Mono, monospace', marginBottom: 8 }}>$90B</p>
+            <div style={{ padding: 'clamp(24px,5vw,48px) clamp(20px,4vw,40px)', borderRight: '1px solid #494949', borderBottom: '1px solid #494949' }}>
+              <p style={{ fontSize: 'clamp(48px,9vw,72px)', fontWeight: 900, color: '#FFC000', lineHeight: 1, fontFamily: 'JetBrains Mono, monospace', marginBottom: 8 }}>$90B</p>
               <p style={{ fontSize: 13, color: '#7D7D7D', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>Annual US Military<br />Maintenance Spend</p>
             </div>
 
             {/* Problem statement */}
-            <div style={{ padding: '48px 40px', gridColumn: 'span 2' }}>
+            <div style={{ padding: 'clamp(24px,5vw,48px) clamp(20px,4vw,40px)' }}>
               <h2 className="text-h2" style={{ color: '#fff', marginBottom: 20 }}>MAINTENANCE BLINDSPOT</h2>
               <p style={{ fontSize: 14, color: '#969696', lineHeight: 1.8, maxWidth: 680 }}>
                 Military organizations cannot reliably determine whether aircraft, vehicles, and combat equipment are genuinely mission-ready. Maintenance runs on fixed calendar intervals regardless of actual component degradation, while onboard HUMS sensor streams that could forecast failures weeks in advance sit unanalyzed in data silos.
@@ -313,7 +313,7 @@ export default function LandingPage({ onEnterDashboard }) {
           </div>
 
           {/* Impact bullets */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 0, borderLeft: '1px solid #494949', borderBottom: '1px solid #494949', marginTop: 0 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px,100%), 1fr))', gap: 0, borderLeft: '1px solid #494949', borderBottom: '1px solid #494949', marginTop: 0 }}>
             {[
               { icon: AlertTriangle, text: 'Unexpected field failures abort sorties' },
               { icon: AlertTriangle, text: 'Calendar-interval maintenance ignores actual degradation' },
@@ -333,7 +333,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── SOLUTION ── */}
-      <section id="solution" style={{ padding: '100px 24px', background: '#000', borderTop: '1px solid #494949' }}>
+      <section id="solution" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#000', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 16 }}>THE SOLUTION</p>
@@ -373,7 +373,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── LIVE METRICS ── */}
-      <section style={{ padding: '0 24px 0', background: '#000' }}>
+      <section style={{ padding: '0 clamp(16px,4vw,24px)', background: '#000' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ padding: '32px 0 20px' }}>
             <p className="label-upper-gold" style={{ marginBottom: 6 }}>LIVE FLEET METRICS</p>
@@ -386,7 +386,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="features" style={{ padding: '100px 24px', background: '#000', borderTop: '1px solid #494949' }}>
+      <section id="features" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#000', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 16 }}>FEATURE SET</p>
@@ -394,7 +394,7 @@ export default function LandingPage({ onEnterDashboard }) {
             NINE WORKING SYSTEMS
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px,100%), 1fr))', gap: 32 }}>
             {FEATURES.map(f => {
               const Icon = f.icon
               return (
@@ -430,7 +430,7 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── STACK ── */}
-      <section id="stack" style={{ padding: '100px 24px', background: '#181818', borderTop: '1px solid #494949' }}>
+      <section id="stack" style={{ padding: 'clamp(60px,8vw,100px) clamp(16px,4vw,24px)', background: '#181818', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 16 }}>TECHNOLOGY STACK</p>
@@ -442,10 +442,10 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── KNOWN LIMITATIONS ── */}
-      <section style={{ padding: '48px 24px', background: '#000', borderTop: '1px solid #494949' }}>
+      <section style={{ padding: 'clamp(32px,5vw,48px) clamp(16px,4vw,24px)', background: '#000', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <p className="label-upper" style={{ marginBottom: 16, color: '#F59E0B' }}>KNOWN LIMITATIONS — SYSTEM STATUS</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 0, borderLeft: '1px solid #494949', borderTop: '1px solid #494949' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px,100%), 1fr))', gap: 0, borderLeft: '1px solid #494949', borderTop: '1px solid #494949' }}>
             {[
               'Sensor streams are simulated from real NASA C-MAPSS run-to-failure turbofan data, not a physical MIL-STD-1553 aircraft bus.',
               'If no IBM Cloud credentials are configured, the system runs an offline deterministic Granite 3-8B simulation engine instead of live watsonx.ai.',
@@ -461,14 +461,14 @@ export default function LandingPage({ onEnterDashboard }) {
       </section>
 
       {/* ── TEAM ── */}
-      <section id="team" style={{ padding: '80px 24px', background: '#181818', borderTop: '1px solid #494949' }}>
+      <section id="team" style={{ padding: 'clamp(48px,7vw,80px) clamp(16px,4vw,24px)', background: '#181818', borderTop: '1px solid #494949' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="gold-rule" style={{ marginBottom: 24 }} />
           <p className="label-upper" style={{ marginBottom: 8 }}>TEAM</p>
           <h2 className="text-h2" style={{ color: '#fff', marginBottom: 8, textTransform: 'uppercase' }}>GALCOGENS</h2>
           <p style={{ fontSize: 12, color: '#494949', fontFamily: 'JetBrains Mono, monospace', marginBottom: 40 }}>TRACK: AI · DEFENSE AEROSPACE & CBM+</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 0, borderLeft: '1px solid #494949', borderTop: '1px solid #494949' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px,100%), 1fr))', gap: 0, borderLeft: '1px solid #494949', borderTop: '1px solid #494949' }}>
             {TEAM.map(m => (
               <div key={m.name} style={{ padding: '24px', borderRight: '1px solid #494949', borderBottom: '1px solid #494949' }}>
                 <div style={{ width: 36, height: 36, background: '#202020', border: '1px solid #FFC000', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12, fontSize: 13, fontWeight: 800, color: '#FFC000', fontFamily: 'JetBrains Mono, monospace' }}>
