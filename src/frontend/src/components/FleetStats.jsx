@@ -7,37 +7,36 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
   const fmc = summary?.fmc_count ?? 14
   const pmc = summary?.pmc_count ?? 0
   const nmc = summary?.nmc_count ?? 6
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {/* 1. Fleet FMC Rate Card */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'FMC' ? null : 'FMC')}
-        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'FMC' 
-            ? 'ring-1 ring-emerald-500 border-emerald-500/80 shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
-            : ''
+            ? 'ring-1 ring-blue-500 border-blue-500/80' 
+            : 'hover:border-slate-700'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
             FLEET READINESS INDEX
           </span>
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
             <Gauge className="w-4 h-4" />
           </div>
         </div>
 
         <div className="flex items-baseline justify-between">
           <span className="text-3xl font-extrabold text-white font-mono tracking-tight">{fmcPct}%</span>
-          <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
+          <span className="text-xs font-mono font-medium text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
             {fmc}/{total} AIRWORTHY
           </span>
         </div>
 
-        <div className="mt-3 w-full bg-slate-950 rounded-full h-2 p-0.5 border border-slate-800">
+        <div className="mt-3 w-full bg-slate-900 rounded-full h-1.5 overflow-hidden border border-slate-800">
           <div 
-            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(16,185,129,0.6)]" 
+            className="bg-emerald-500 h-full rounded-full transition-all duration-700" 
             style={{ width: `${fmcPct}%` }}
           />
         </div>
@@ -46,14 +45,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 2. Fully Mission Capable (FMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'FMC' ? null : 'FMC')}
-        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'FMC' 
-            ? 'ring-1 ring-emerald-500 border-emerald-500/80 shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
-            : ''
+            ? 'ring-1 ring-emerald-500 border-emerald-500/80' 
+            : 'hover:border-slate-700'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
             FULLY MISSION CAPABLE
           </span>
           <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -73,14 +72,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 3. Partially Mission Capable (PMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'PMC' ? null : 'PMC')}
-        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'PMC' 
-            ? 'ring-1 ring-amber-500 border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.3)]' 
-            : ''
+            ? 'ring-1 ring-amber-500 border-amber-500/80' 
+            : 'hover:border-slate-700'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
             PARTIALLY MISSION CAPABLE
           </span>
           <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
@@ -100,14 +99,14 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 4. Non-Mission Capable (NMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'NMC' ? null : 'NMC')}
-        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
+        className={`panel-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'NMC' 
-            ? 'ring-1 ring-rose-500 border-rose-500/80 shadow-[0_0_20px_rgba(244,63,94,0.35)]' 
-            : ''
+            ? 'ring-1 ring-rose-500 border-rose-500/80' 
+            : 'hover:border-slate-700'
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+          <span className="text-[11px] font-mono font-medium tracking-wider uppercase text-slate-400">
             NON-MISSION CAPABLE
           </span>
           <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500">
@@ -117,9 +116,9 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
 
         <div className="flex items-baseline space-x-2">
           <span className="text-3xl font-extrabold text-rose-500 font-mono tracking-tight">{nmc}</span>
-          <span className="text-xs font-mono font-bold text-rose-400 tracking-wider">GROUNDED</span>
+          <span className="text-xs font-mono font-medium text-rose-400 tracking-wider">GROUNDED</span>
         </div>
-        <p className="text-[11px] text-rose-300 mt-2 font-sans font-medium">
+        <p className="text-[11px] text-rose-300 mt-2 font-sans">
           Imminent failure or critical safety limits exceeded. Priority turnaround required.
         </p>
       </div>

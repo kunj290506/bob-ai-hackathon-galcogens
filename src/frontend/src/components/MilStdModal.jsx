@@ -38,18 +38,18 @@ export default function MilStdModal({ assetCode, onClose }) {
   const isRedDiag = formData?.discrepancy_block?.symbol === 'RED_DIAGONAL'
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="uiverse-card max-w-4xl w-full p-6 relative text-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col border border-slate-700/80 shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-slate-900 max-w-4xl w-full p-6 relative text-slate-200 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col border border-slate-800 rounded-xl shadow-2xl">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.25)]">
+            <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
               <Shield className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <h2 className="text-base font-bold text-white font-mono tracking-wider">{assetCode}</h2>
-                <span className="text-[10px] font-mono font-bold tracking-widest px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-700">
+                <span className="text-[10px] font-mono font-medium tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
                   MIL-STD-1388 / T.O. 00-20-1
                 </span>
               </div>
@@ -62,29 +62,30 @@ export default function MilStdModal({ assetCode, onClose }) {
           <div className="flex items-center space-x-2">
             <button
               onClick={() => window.print()}
-              className="uiverse-btn-ghost !py-1.5 !px-2.5"
+              className="btn-secondary !py-1.5 !px-2.5 text-xs"
               title="Print Official Document"
             >
-              <Printer className="w-4 h-4" />
+              <Printer className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Print Dispatch</span>
             </button>
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Segmented Tab Selection (Uiverse style) */}
-        <div className="flex items-center space-x-2 mb-4 border-b border-slate-800/80 pb-3">
+        {/* Segmented Tab Selection */}
+        <div className="flex items-center space-x-2 mb-4 border-b border-slate-800 pb-3">
           <button
             onClick={() => setActiveTab('form781')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition flex items-center space-x-2 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition flex items-center space-x-2 border ${
               activeTab === 'form781'
-                ? 'uiverse-tab-active'
-                : 'uiverse-tab-inactive'
+                ? 'bg-slate-800 border-blue-500 text-white'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -93,10 +94,10 @@ export default function MilStdModal({ assetCode, onClose }) {
 
           <button
             onClick={() => setActiveTab('sortie')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-bold transition flex items-center space-x-2 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition flex items-center space-x-2 border ${
               activeTab === 'sortie'
-                ? 'uiverse-tab-active'
-                : 'uiverse-tab-inactive'
+                ? 'bg-slate-800 border-blue-500 text-white'
+                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -108,11 +109,11 @@ export default function MilStdModal({ assetCode, onClose }) {
         <div className="flex-1 overflow-y-auto pr-1">
           {loading ? (
             <div className="py-20 text-center text-xs text-slate-400 font-mono flex flex-col items-center justify-center space-y-2">
-              <span className="radar-beacon"></span>
+              <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
               <span>Compiling defense discrepancy manifest from prognostics telemetry...</span>
             </div>
           ) : error ? (
-            <div className="p-4 bg-rose-950/40 border border-rose-800 rounded-xl text-xs text-rose-300 font-mono">
+            <div className="p-4 bg-rose-950/30 border border-rose-800 rounded-xl text-xs text-rose-300 font-mono">
               {error}
             </div>
           ) : activeTab === 'form781' && formData ? (
@@ -162,15 +163,15 @@ export default function MilStdModal({ assetCode, onClose }) {
               </div>
 
               {/* Military Symbol & Discrepancy Block */}
-              <div className="border border-slate-700/80 rounded-xl p-4 bg-slate-900/50">
+              <div className="border border-slate-700/80 rounded-lg p-4 bg-slate-900/50">
                 <div className="flex items-start space-x-4">
                   {/* Red X / Red Diagonal Symbol Box */}
-                  <div className={`w-16 h-16 rounded-xl flex items-center justify-center font-black text-3xl shrink-0 border-2 ${
+                  <div className={`w-14 h-14 rounded-lg flex items-center justify-center font-black text-2xl shrink-0 border-2 ${
                     isRedX
-                      ? 'bg-rose-950/70 border-rose-500 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)]'
+                      ? 'bg-rose-950/70 border-rose-500 text-rose-400'
                       : isRedDiag
-                      ? 'bg-amber-950/70 border-amber-500 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
-                      : 'bg-emerald-950/70 border-emerald-500 text-emerald-500'
+                      ? 'bg-amber-950/70 border-amber-500 text-amber-400'
+                      : 'bg-emerald-950/70 border-emerald-500 text-emerald-400'
                   }`}>
                     {formData.discrepancy_block.symbol_display}
                   </div>
@@ -192,9 +193,9 @@ export default function MilStdModal({ assetCode, onClose }) {
               </div>
 
               {/* Corrective Action Block */}
-              <div className="border border-slate-700/80 rounded-xl p-4 bg-slate-900/50 space-y-2">
+              <div className="border border-slate-700/80 rounded-lg p-4 bg-slate-900/50 space-y-2">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <span className="text-[11px] font-bold text-emerald-400 uppercase flex items-center space-x-1.5">
+                  <span className="text-[11px] font-semibold text-emerald-400 uppercase flex items-center space-x-1.5">
                     <Wrench className="w-3.5 h-3.5" />
                     <span>CORRECTIVE ACTION DIRECTIVE</span>
                   </span>
@@ -229,7 +230,7 @@ export default function MilStdModal({ assetCode, onClose }) {
                   <tbody className="divide-y divide-slate-800 text-[11px]">
                     {formData.parts_manifest?.map((p, idx) => (
                       <tr key={idx} className="hover:bg-slate-900/50">
-                        <td className="p-2 font-mono text-emerald-400">{p.nsn}</td>
+                        <td className="p-2 font-mono text-blue-400">{p.nsn}</td>
                         <td className="p-2 text-white">{p.part_name}</td>
                         <td className="p-2 font-bold">{p.qty}</td>
                         <td className="p-2 text-slate-400">{p.unit}</td>
@@ -242,11 +243,11 @@ export default function MilStdModal({ assetCode, onClose }) {
           ) : activeTab === 'sortie' && sortieData ? (
             /* ATO Sortie Re-allocation Matrix */
             <div className="space-y-4">
-              <div className="uiverse-card p-4">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 mb-1">
-                  TACTICAL OPERATIONAL DISPOSITION
+              <div className="panel-card p-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
+                  Tactical Operational Disposition
                 </h4>
-                <p className="text-xs text-emerald-400 font-semibold font-sans">
+                <p className="text-xs text-emerald-400 font-medium font-sans">
                   {sortieData.tactical_disposition}
                 </p>
                 <p className="text-[11px] text-slate-400 font-mono mt-1.5">
@@ -257,7 +258,7 @@ export default function MilStdModal({ assetCode, onClose }) {
 
               {/* Cleared Sorties List */}
               <div className="space-y-2">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Approved Mission Sortie Profiles</span>
                 </h4>
@@ -267,11 +268,11 @@ export default function MilStdModal({ assetCode, onClose }) {
                   </p>
                 ) : (
                   sortieData.cleared_sortie_profiles.map((p, i) => (
-                    <div key={i} className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 flex items-center justify-between shadow-sm">
+                    <div key={i} className="p-3.5 rounded-lg bg-slate-800/40 border border-slate-700/60 flex items-center justify-between">
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-bold text-xs text-white tracking-tight">{p.profile_name}</span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <span className="font-semibold text-xs text-white tracking-tight">{p.profile_name}</span>
+                          <span className="status-badge-fmc text-[10px]">
                             {p.stress_level} STRESS
                           </span>
                         </div>
@@ -279,7 +280,7 @@ export default function MilStdModal({ assetCode, onClose }) {
                           Safety Margin: +{p.margin_hours} flight hours above mission threshold
                         </p>
                       </div>
-                      <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-500 text-slate-950 shadow-[0_0_8px_rgba(16,185,129,0.5)]">
+                      <span className="status-badge-fmc text-[10px]">
                         CLEARED
                       </span>
                     </div>
@@ -289,16 +290,16 @@ export default function MilStdModal({ assetCode, onClose }) {
 
               {/* Restricted Sorties List */}
               <div className="space-y-2">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-rose-400 flex items-center space-x-1.5">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-rose-400 flex items-center space-x-1.5">
                   <AlertOctagon className="w-4 h-4" />
                   <span>Restricted Air Tasking Order Profiles</span>
                 </h4>
                 {sortieData.restricted_sortie_profiles?.map((p, i) => (
-                  <div key={i} className="p-3.5 rounded-xl bg-rose-950/20 border border-rose-800/40 flex items-center justify-between">
+                  <div key={i} className="p-3.5 rounded-lg bg-rose-950/15 border border-rose-800/40 flex items-center justify-between">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="font-bold text-xs text-white tracking-tight">{p.profile_name}</span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        <span className="font-semibold text-xs text-white tracking-tight">{p.profile_name}</span>
+                        <span className="status-badge-nmc text-[10px]">
                           {p.stress_level} STRESS
                         </span>
                       </div>
@@ -306,7 +307,7 @@ export default function MilStdModal({ assetCode, onClose }) {
                         Restriction: {p.reason}
                       </p>
                     </div>
-                    <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/40">
+                    <span className="status-badge-nmc text-[10px]">
                       RESTRICTED
                     </span>
                   </div>

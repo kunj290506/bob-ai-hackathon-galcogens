@@ -1,5 +1,6 @@
-https://youtu.be/d1-mission-readiness-galcogens-demo
+https://github.com/kunj290506/bob-ai-hackathon-galcogens#demo-video-pending-recording
 
-Demo Video: D1 Mission Readiness & Predictive Maintenance Copilot
+DEMO VIDEO: PENDING FINAL RECORDING
+Repository: https://github.com/kunj290506/bob-ai-hackathon-galcogens
 Team: Galcogens (Track: AI)
-Walkthrough of Fleet Overview, GPU RUL predictions, watsonx.ai Granite diagnostics, and IBM Bob MCP tool execution.
+Note: The final unlisted 3-minute YouTube / Loom video link will be added upon final recording.

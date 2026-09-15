@@ -73,31 +73,30 @@ export default function SimulatorView({ assets = [] }) {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="uiverse-card p-6">
+      <div className="panel-card p-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2 mb-1">
-              <span className="text-[10px] font-mono font-bold tracking-widest px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                DIGITAL TWIN PROGNOSTICS
+              <span className="text-[10px] font-mono font-medium tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                STRESS PROGNOSTICS
               </span>
-              <span className="text-[10px] font-mono text-slate-400">GPU-Accelerated XGBoost Engine</span>
+              <span className="text-[11px] text-slate-400">XGBoost Degradation Engine</span>
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">
-              Operational Theater Stress & Mission Survivability Simulator
+              Sortie Stress & Mission Survivability Simulator
             </h2>
             <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
-              Inject aerodynamic and environmental extremes before flight authorization. Evaluates compressor thermodynamic 
-              shifts, sand/dust erosion multipliers, and high-G combat turns to predict accelerated wear and survivability.
+              Evaluate thermodynamic shifts, particulate sand erosion, and high-G combat maneuvers against component remaining useful life prior to flight authorization.
             </p>
           </div>
 
           <button
             onClick={handleRunSimulation}
             disabled={simulating}
-            className="uiverse-btn-primary !px-5 !py-2.5"
+            className="btn-primary !px-5 !py-2.5 text-xs font-semibold"
           >
-            <Play className={`w-4 h-4 ${simulating ? 'animate-spin' : 'fill-slate-950'}`} />
-            <span>{simulating ? 'Computing Dynamics...' : 'Execute Stress Simulation'}</span>
+            <Play className={`w-4 h-4 ${simulating ? 'animate-spin' : ''}`} />
+            <span>{simulating ? 'Computing Dynamics...' : 'Execute Simulation'}</span>
           </button>
         </div>
       </div>
@@ -105,23 +104,23 @@ export default function SimulatorView({ assets = [] }) {
       {/* Main Grid: Controls vs Results */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Parameter Configuration (5 cols) */}
-        <div className="lg:col-span-5 uiverse-card p-6 space-y-6">
-          <div className="flex items-center space-x-2 border-b border-slate-800/80 pb-3">
-            <Sliders className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+        <div className="lg:col-span-5 panel-card p-6 space-y-5">
+          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+            <Sliders className="w-4 h-4 text-slate-400" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
               Sortie Stress Parameters
             </h3>
           </div>
 
           {/* Select Platform */}
           <div>
-            <label className="block text-xs font-mono font-medium text-slate-400 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               TARGET PLATFORM AIRFRAME
             </label>
             <select
               value={selectedAssetCode}
               onChange={e => setSelectedAssetCode(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono shadow-inner"
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-mono"
             >
               {assets.map(a => (
                 <option key={a.id} value={a.asset_code}>
@@ -133,7 +132,7 @@ export default function SimulatorView({ assets = [] }) {
 
           {/* Environmental Theater Presets */}
           <div>
-            <label className="block text-xs font-mono font-medium text-slate-400 mb-2">
+            <label className="block text-xs font-medium text-slate-400 mb-2">
               ENVIRONMENTAL THEATER SCENARIO
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -145,15 +144,15 @@ export default function SimulatorView({ assets = [] }) {
                     key={p.id}
                     type="button"
                     onClick={() => setMissionProfile(p.id)}
-                    className={`p-3 rounded-xl text-left transition flex flex-col justify-between ${
+                    className={`p-3 rounded-lg text-left transition flex flex-col justify-between border ${
                       isSelected
-                        ? 'uiverse-tab-active'
-                        : 'uiverse-tab-inactive'
+                        ? 'bg-slate-800 border-blue-500 text-white'
+                        : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-300'
                     }`}
                   >
                     <div className="flex items-center space-x-2 mb-1.5">
-                      <Icon className={`w-4 h-4 ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`} />
-                      <span className="text-xs font-mono font-bold">{p.name.split(' ')[0]}</span>
+                      <Icon className={`w-4 h-4 ${isSelected ? 'text-blue-400' : 'text-slate-400'}`} />
+                      <span className="text-xs font-semibold">{p.name.split(' ')[0]}</span>
                     </div>
                     <span className="text-[10px] line-clamp-2 text-slate-400 font-sans">{p.desc}</span>
                   </button>
@@ -166,7 +165,7 @@ export default function SimulatorView({ assets = [] }) {
           <div>
             <div className="flex justify-between items-center text-xs mb-2">
               <span className="text-slate-400 font-mono text-[11px]">SORTIE DURATION</span>
-              <span className="font-mono font-bold text-emerald-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-700">
+              <span className="font-mono font-bold text-white bg-slate-800 px-2.5 py-0.5 rounded border border-slate-700">
                 {durationHours} Hours
               </span>
             </div>
@@ -177,7 +176,7 @@ export default function SimulatorView({ assets = [] }) {
               step="0.5"
               value={durationHours}
               onChange={e => setDurationHours(e.target.value)}
-              className="w-full"
+              className="w-full accent-blue-500 cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
               <span>1.0h (Strike)</span>
@@ -190,7 +189,7 @@ export default function SimulatorView({ assets = [] }) {
           <div>
             <div className="flex justify-between items-center text-xs mb-2">
               <span className="text-slate-400 font-mono text-[11px]">PEAK G-ENVELOPE</span>
-              <span className="font-mono font-bold text-amber-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-700">
+              <span className="font-mono font-bold text-white bg-slate-800 px-2.5 py-0.5 rounded border border-slate-700">
                 {gRating} G
               </span>
             </div>
@@ -201,7 +200,7 @@ export default function SimulatorView({ assets = [] }) {
               step="0.5"
               value={gRating}
               onChange={e => setGRating(e.target.value)}
-              className="w-full"
+              className="w-full accent-blue-500 cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
               <span>1.0G (Transit)</span>
@@ -212,24 +211,24 @@ export default function SimulatorView({ assets = [] }) {
         </div>
 
         {/* Right Column: Simulation Output & Physics Telemetry (7 cols) */}
-        <div className="lg:col-span-7 uiverse-card p-6 flex flex-col justify-between space-y-6">
+        <div className="lg:col-span-7 panel-card p-6 flex flex-col justify-between space-y-6">
           {error && (
-            <div className="bg-rose-950/40 border border-rose-800/60 rounded-xl p-4 text-xs text-rose-300 font-mono">
+            <div className="bg-rose-950/30 border border-rose-800/60 rounded-lg p-4 text-xs text-rose-300 font-mono">
               {error}
             </div>
           )}
 
           {!result ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-16 text-slate-400 space-y-3">
-              <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 shadow-inner">
-                <Activity className="w-7 h-7" />
+              <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400">
+                <Activity className="w-6 h-6" />
               </div>
-              <p className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">
+              <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
                 Digital Twin Ready for Physics Excursion
               </p>
-              <p className="text-[11px] max-w-sm font-sans">
+              <p className="text-xs max-w-sm font-sans text-slate-400">
                 Select theater profile and sortie parameters on the left, then click{' '}
-                <strong className="text-emerald-400">"Execute Stress Simulation"</strong> to evaluate component degradation.
+                <strong className="text-white">"Execute Simulation"</strong> to evaluate component degradation.
               </p>
             </div>
           ) : (
@@ -237,80 +236,76 @@ export default function SimulatorView({ assets = [] }) {
               {/* Top Banner: Survivability Gauge */}
               <div className={`rounded-xl p-5 border flex flex-col sm:flex-row items-center justify-between gap-4 ${
                 isSurvivable
-                  ? 'bg-emerald-950/30 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
-                  : 'bg-rose-950/30 border-rose-500/50 shadow-[0_0_20px_rgba(244,63,94,0.25)]'
+                  ? 'bg-emerald-950/20 border-emerald-500/40'
+                  : 'bg-rose-950/20 border-rose-500/40'
               }`}>
                 <div className="flex items-center space-x-4">
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold font-mono border ${
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-lg font-bold font-mono border ${
                     isSurvivable
-                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                      : 'bg-rose-500/20 border-rose-500/50 text-rose-300'
+                      ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                      : 'bg-rose-500/20 border-rose-500/40 text-rose-300'
                   }`}>
                     {survivability}%
                   </div>
                   <div>
-                    <h4 className="text-sm font-mono font-bold text-white tracking-wide">
-                      {isSurvivable ? 'SURVIVABILITY: AUTHORIZED FOR SORTIE' : 'CRITICAL: MISSION ABORT RECOMMENDED'}
+                    <h4 className="text-xs font-semibold text-white tracking-wide uppercase">
+                      {isSurvivable ? 'Survivability: Cleared for Sortie' : 'Critical: Sortie Abort Recommended'}
                     </h4>
-                    <p className="text-xs text-slate-300 mt-0.5 font-mono">
-                      Target: <strong className="text-white">{result.asset_code}</strong> ({result.asset_name})
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Target: <strong className="text-slate-200 font-mono">{result.asset_code}</strong> ({result.asset_name})
                     </p>
                   </div>
                 </div>
 
-                <span className={`px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider ${
-                  isSurvivable 
-                    ? 'bg-emerald-500 text-slate-950 shadow-[0_0_10px_rgba(16,185,129,0.5)]' 
-                    : 'bg-rose-600 text-white shadow-[0_0_10px_rgba(244,63,94,0.6)] animate-pulse'
-                }`}>
+                <span className={isSurvivable ? 'status-badge-fmc' : 'status-badge-nmc'}>
                   {isSurvivable ? 'CLEARED' : 'UNSAFE'}
                 </span>
               </div>
 
               {/* Telemetry Metrics 4-Box */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl shadow-inner">
+                <div className="bg-slate-800/50 border border-slate-700/60 p-3.5 rounded-lg">
                   <p className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Wear Factor</p>
-                  <p className="text-lg font-bold font-mono text-amber-400 mt-1">
+                  <p className="text-base font-bold font-mono text-amber-400 mt-1">
                     {result.wear_acceleration_multiplier}x
                   </p>
-                  <p className="text-[9px] text-slate-400 mt-0.5">vs ISA Standard</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">vs Standard</p>
                 </div>
 
-                <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl shadow-inner">
+                <div className="bg-slate-800/50 border border-slate-700/60 p-3.5 rounded-lg">
                   <p className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">EGT Spike</p>
-                  <p className="text-lg font-bold font-mono text-rose-400 mt-1">
+                  <p className="text-base font-bold font-mono text-rose-400 mt-1">
                     +{result.projected_egt_spike_deg_r}°R
                   </p>
-                  <p className="text-[9px] text-slate-400 mt-0.5">Exhaust Gas Temp Delta</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Temp Delta</p>
                 </div>
 
-                <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl shadow-inner">
+                <div className="bg-slate-800/50 border border-slate-700/60 p-3.5 rounded-lg">
                   <p className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Nominal Base RUL</p>
-                  <p className="text-lg font-bold font-mono text-slate-300 mt-1">
+                  <p className="text-base font-bold font-mono text-slate-300 mt-1">
                     {result.nominal_predicted_rul} hrs
                   </p>
-                  <p className="text-[9px] text-slate-400 mt-0.5">Baseline Life</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Baseline Life</p>
                 </div>
 
-                <div className="bg-slate-900/80 border border-slate-800 p-3.5 rounded-xl shadow-inner">
+                <div className="bg-slate-800/50 border border-slate-700/60 p-3.5 rounded-lg">
                   <p className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Stressed RUL</p>
-                  <p className={`text-lg font-bold font-mono mt-1 ${
+                  <p className={`text-base font-bold font-mono mt-1 ${
                     result.effective_theater_rul < durationHours ? 'text-rose-400' : 'text-emerald-400'
                   }`}>
                     {result.effective_theater_rul} hrs
                   </p>
-                  <p className="text-[9px] text-slate-400 mt-0.5">Theater Residual</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Theater Residual</p>
                 </div>
               </div>
 
               {/* Tactical Operations Advisory */}
-              <div className="bg-slate-900/90 border border-slate-800/90 rounded-xl p-4 shadow-inner">
-                <div className="flex items-center space-x-2 text-xs font-mono font-bold text-white mb-2">
-                  <ShieldAlert className="w-4 h-4 text-emerald-400" />
+              <div className="bg-slate-800/40 border border-slate-700/60 rounded-lg p-4">
+                <div className="flex items-center space-x-2 text-xs font-semibold text-slate-300 mb-2">
+                  <ShieldAlert className="w-4 h-4 text-blue-400" />
                   <span>TACTICAL OPERATIONS DIRECTIVE</span>
                 </div>
-                <p className="text-xs text-slate-200 leading-relaxed font-sans">
+                <p className="text-xs text-slate-300 leading-relaxed font-sans">
                   {result.tactical_recommendation}
                 </p>
               </div>
@@ -323,14 +318,14 @@ export default function SimulatorView({ assets = [] }) {
                     {durationHours}h used of {result.effective_theater_rul}h capacity
                   </span>
                 </div>
-                <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-700/60">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       (durationHours / result.effective_theater_rul) > 0.85
-                        ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]'
+                        ? 'bg-rose-500'
                         : (durationHours / result.effective_theater_rul) > 0.5
-                        ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                        : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                        ? 'bg-amber-500'
+                        : 'bg-emerald-500'
                     }`}
                     style={{
                       width: `${Math.min(100, Math.round((durationHours / Math.max(1, result.effective_theater_rul)) * 100))}%`

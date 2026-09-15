@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import Navbar from './components/Navbar.jsx'
-import FleetStats from './components/FleetStats.jsx'
-import AssetCard from './components/AssetCard.jsx'
+import OverviewView from './components/OverviewView.jsx'
+import FleetTableView from './components/FleetTableView.jsx'
 import AssetDetailModal from './components/AssetDetailModal.jsx'
 import PredictionsView from './components/PredictionsView.jsx'
 import WorkOrdersView from './components/WorkOrdersView.jsx'
 import CopilotChatDrawer from './components/CopilotChatDrawer.jsx'
 import SimulatorView from './components/SimulatorView.jsx'
 import MilStdModal from './components/MilStdModal.jsx'
-import { Plane, Clock, Wrench, Sparkles, X, Activity, FileText, Target, Crosshair } from 'lucide-react'
+import { LayoutDashboard, Plane, Clock, Wrench, Activity, FileText, Target, Sparkles, X, Shield } from 'lucide-react'
 
 export default function App() {
   const [summary, setSummary] = useState(null)
@@ -17,16 +17,15 @@ export default function App() {
   const [workOrders, setWorkOrders] = useState([])
   const [missions, setMissions] = useState([])
   
-  const [activeTab, setActiveTab] = useState('fleet') // fleet, predictions, maintenance, missions, simulator, milforms
+  const searchParams = new URLSearchParams(window.location.search)
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview') // overview, fleet, predictions, maintenance, missions, simulator, milforms
   const [selectedAsset, setSelectedAsset] = useState(null)
   const [assetDetail, setAssetDetail] = useState(null)
-  const [chatOpen, setChatOpen] = useState(false)
-  const [chatInitialQuery, setChatInitialQuery] = useState('')
+  const [chatOpen, setChatOpen] = useState(searchParams.get('chat') === '1')
+  const [chatInitialQuery, setChatInitialQuery] = useState(searchParams.get('query') || '')
   const [briefingModalOpen, setBriefingModalOpen] = useState(false)
   const [briefingContent, setBriefingContent] = useState('')
   
-  const [statusFilter, setStatusFilter] = useState(null)
-  const [typeFilter, setTypeFilter] = useState('ALL')
   const [viewMilStdAssetCode, setViewMilStdAssetCode] = useState(null)
 
   // Load initial data
@@ -85,7 +84,7 @@ export default function App() {
 
   const handleGenerateBriefing = async () => {
     setBriefingModalOpen(true)
-    setBriefingContent('INITIALIZING SECURE LINK: Querying fleet telemetry, calculating RUL excursions, and synthesizing Granite 3-8B commander briefing...')
+    setBriefingContent('Synthesizing watsonx.ai Granite 3-8B commander briefing from HUMS telemetry and C-MAPSS RUL excursions...')
     try {
       const res = await fetch('/api/v1/copilot/briefing')
       const data = await res.json()
@@ -95,14 +94,8 @@ export default function App() {
     }
   }
 
-  const filteredAssets = assets.filter(a => {
-    if (statusFilter && a.status !== statusFilter) return false
-    if (typeFilter !== 'ALL' && a.asset_type !== typeFilter) return false
-    return true
-  })
-
   return (
-    <div className="min-h-screen tactical-bg text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       <Navbar 
         onOpenChat={() => {
           setChatInitialQuery('')
@@ -111,141 +104,105 @@ export default function App() {
         onGenerateBriefing={handleGenerateBriefing}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-6">
-        {/* Top Fleet KPI Stats */}
-        <FleetStats 
-          summary={summary} 
-          onFilterStatus={setStatusFilter}
-          activeFilter={statusFilter}
-        />
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
+        {/* Navigation Tabs */}
+        <div className="flex items-center justify-between border-b border-slate-800 pb-3 gap-2 overflow-x-auto">
+          <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={activeTab === 'overview' ? 'nav-tab-active' : 'nav-tab-inactive'}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>Overview</span>
+            </button>
 
-        {/* Navigation Tabs (Uiverse Segmented Bar) */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-800/90 pb-4 mb-6 gap-3">
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 md:pb-0">
             <button
               onClick={() => setActiveTab('fleet')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'fleet'
-                  ? 'uiverse-tab-active'
-                  : 'uiverse-tab-inactive'
-              }`}
+              className={activeTab === 'fleet' ? 'nav-tab-active' : 'nav-tab-inactive'}
             >
-              <Plane className="w-4 h-4 text-emerald-400" />
-              <span>Fleet Operations ({filteredAssets.length})</span>
+              <Plane className="w-3.5 h-3.5" />
+              <span>Fleet Operations ({assets.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('predictions')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'predictions'
-                  ? 'uiverse-tab-active'
-                  : 'uiverse-tab-inactive'
-              }`}
+              className={activeTab === 'predictions' ? 'nav-tab-active' : 'nav-tab-inactive'}
             >
-              <Clock className="w-4 h-4 text-purple-400" />
-              <span>Predictive RUL Timeline ({predictions.length})</span>
+              <Clock className="w-3.5 h-3.5" />
+              <span>Predictive RUL ({predictions.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('maintenance')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'maintenance'
-                  ? 'uiverse-tab-active'
-                  : 'uiverse-tab-inactive'
-              }`}
+              className={activeTab === 'maintenance' ? 'nav-tab-active' : 'nav-tab-inactive'}
             >
-              <Wrench className="w-4 h-4 text-emerald-400" />
+              <Wrench className="w-3.5 h-3.5" />
               <span>Work Orders ({workOrders.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('missions')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'missions'
-                  ? 'uiverse-tab-active'
-                  : 'uiverse-tab-inactive'
-              }`}
+              className={activeTab === 'missions' ? 'nav-tab-active' : 'nav-tab-inactive'}
             >
-              <Target className="w-4 h-4 text-blue-400" />
+              <Target className="w-3.5 h-3.5" />
               <span>Missions ({missions.length})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('simulator')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'simulator'
-                  ? 'uiverse-tab-active'
-                  : 'uiverse-tab-inactive'
-              }`}
+              className={activeTab === 'simulator' ? 'nav-tab-active' : 'nav-tab-inactive'}
             >
-              <Activity className="w-4 h-4 text-amber-400" />
+              <Activity className="w-3.5 h-3.5" />
               <span>Stress Simulator</span>
             </button>
 
             <button
               onClick={() => setActiveTab('milforms')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center space-x-2 shrink-0 ${
-                activeTab === 'milforms'
-                  ? 'uiverse-tab-active'
-                  : 'uiverse-tab-inactive'
-              }`}
+              className={activeTab === 'milforms' ? 'nav-tab-active' : 'nav-tab-inactive'}
             >
-              <FileText className="w-4 h-4 text-blue-400" />
+              <FileText className="w-3.5 h-3.5" />
               <span>AFTO-781A & Sorties</span>
             </button>
           </div>
 
-          {/* Subsystem / Type Filter */}
-          {activeTab === 'fleet' && (
-            <div className="flex items-center space-x-1.5 self-start md:self-auto overflow-x-auto">
-              {['ALL', 'FIGHTER_JET', 'ATTACK_HELICOPTER', 'MAIN_BATTLE_TANK', 'TRANSPORT_AIRCRAFT'].map(t => (
-                <button
-                  key={t}
-                  onClick={() => setTypeFilter(t)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono transition uppercase ${
-                    typeFilter === t
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-bold shadow-[0_0_8px_rgba(16,185,129,0.3)]'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent'
-                  }`}
-                >
-                  {t.replace('_', ' ')}
-                </button>
-              ))}
-              {(statusFilter || typeFilter !== 'ALL') && (
-                <button
-                  onClick={() => {
-                    setStatusFilter(null)
-                    setTypeFilter('ALL')
-                  }}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-900 transition"
-                  title="Reset Filter"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          )}
+          <div className="hidden lg:flex items-center space-x-2 text-xs text-slate-400 font-mono">
+            <span>DEFENSE CBM+ COMMAND SYSTEM</span>
+          </div>
         </div>
 
-        {/* Tab 1: Fleet Grid */}
-        {activeTab === 'fleet' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredAssets.map(asset => (
-              <AssetCard 
-                key={asset.id} 
-                asset={asset} 
-                onSelect={handleSelectAsset} 
-              />
-            ))}
-          </div>
+        {/* View 1: Overview (Home Dashboard) */}
+        {activeTab === 'overview' && (
+          <OverviewView
+            summary={summary}
+            assets={assets}
+            predictions={predictions}
+            workOrders={workOrders}
+            missions={missions}
+            onSelectAsset={handleSelectAsset}
+            onApproveOrder={handleApproveWorkOrder}
+            onOpenMilStd={(code) => setViewMilStdAssetCode(code)}
+            onAskCopilot={(query) => {
+              setChatInitialQuery(query)
+              setChatOpen(true)
+            }}
+            onNavigateTab={setActiveTab}
+          />
         )}
 
-        {/* Tab 2: Predictive RUL Timeline */}
+        {/* View 2: Fleet Operations Data Table */}
+        {activeTab === 'fleet' && (
+          <FleetTableView 
+            assets={assets} 
+            onSelectAsset={handleSelectAsset} 
+          />
+        )}
+
+        {/* View 3: Predictive RUL Forecasts */}
         {activeTab === 'predictions' && (
           <PredictionsView predictions={predictions} missionWindowHours={48.0} />
         )}
 
-        {/* Tab 3: Maintenance Work Orders */}
+        {/* View 4: Maintenance Work Orders */}
         {activeTab === 'maintenance' && (
           <WorkOrdersView 
             workOrders={workOrders} 
@@ -253,53 +210,67 @@ export default function App() {
           />
         )}
 
-        {/* Tab 4: Missions */}
+        {/* View 5: Missions */}
         {activeTab === 'missions' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {missions.map(m => (
-              <div key={m.id} className="uiverse-card p-5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <span className="text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded bg-blue-950/50 text-blue-300 border border-blue-800/40">
-                      {m.mission_type}
-                    </span>
-                    <span className="text-xs font-mono font-bold text-emerald-400">{m.priority}</span>
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-1.5 tracking-tight">{m.title}</h3>
-                  <p className="text-xs text-slate-400 mb-4 font-sans leading-relaxed">{m.description}</p>
-                </div>
-
-                <div className="pt-3 border-t border-slate-800/80 text-xs text-slate-300 space-y-1.5 font-mono text-[11px]">
-                  <p>Commitment: <strong className="text-white">{m.required_assets_count}x {m.required_asset_type}</strong></p>
-                  <p>Readiness Gate: <strong className="text-emerald-400">{m.minimum_readiness_threshold}% FMC</strong></p>
-                  <p className="text-slate-400">Launch: {new Date(m.start_time).toLocaleString()}</p>
-                </div>
+          <div className="space-y-6">
+            <div className="panel-card p-6">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-[10px] font-mono font-medium tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                  AIR TASKING ORDERS
+                </span>
+                <span className="text-[11px] text-slate-400">Tactical Deployment Schedule</span>
               </div>
-            ))}
+              <h2 className="text-xl font-bold text-white tracking-tight">Active Sortie Deployments</h2>
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
+                Review operational air tasking orders, asset commitments, and minimum fleet readiness thresholds required for launch authorization.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {missions.map(m => (
+                <div key={m.id} className="panel-card p-5 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-[10px] font-mono uppercase font-semibold px-2 py-0.5 rounded bg-blue-950/80 text-blue-300 border border-blue-800/40">
+                        {m.mission_type}
+                      </span>
+                      <span className="text-xs font-mono font-semibold text-emerald-400">{m.priority}</span>
+                    </div>
+                    <h3 className="text-sm font-semibold text-white mb-1 tracking-tight">{m.title}</h3>
+                    <p className="text-xs text-slate-400 mb-4 font-sans leading-relaxed">{m.description}</p>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-800 text-xs text-slate-300 space-y-1.5 font-mono text-[11px]">
+                    <p>Commitment: <strong className="text-white">{m.required_assets_count}x {m.required_asset_type}</strong></p>
+                    <p>Readiness Gate: <strong className="text-emerald-400">{m.minimum_readiness_threshold}% FMC</strong></p>
+                    <p className="text-slate-400">Launch: {new Date(m.start_time).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Tab 5: Mission Stress Simulator */}
+        {/* View 6: Mission Stress Simulator */}
         {activeTab === 'simulator' && (
           <SimulatorView assets={assets} />
         )}
 
-        {/* Tab 6: AFTO Form 781A & ATO Sortie Matrix */}
+        {/* View 7: AFTO Form 781A & ATO Sortie Matrix */}
         {activeTab === 'milforms' && (
           <div className="space-y-6">
-            <div className="uiverse-card p-6">
+            <div className="panel-card p-6">
               <div className="flex items-center space-x-2 mb-1">
-                <span className="text-[10px] font-mono font-bold tracking-widest px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                  EXPEDITIONARY C2 FLIGHT LINE
+                <span className="text-[10px] font-mono font-medium tracking-wider px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                  EXPEDITIONARY FLIGHT LINE
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">MIL-STD-1388 / T.O. 00-20-1 Compliance</span>
+                <span className="text-[11px] text-slate-400">MIL-STD-1388 / T.O. 00-20-1 Compliance</span>
               </div>
               <h2 className="text-xl font-bold text-white tracking-tight">
                 AFTO Form 781A Discrepancies & ATO Sortie Re-allocation
               </h2>
               <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
-                Automatically generate official Air Force Form 781A maintenance discrepancy documents with Red X / Red Diagonal
-                symbols, JCN tracking numbers, military J-codes, and evaluate mission-adaptive sortie profiles to save degraded combat assets.
+                Review Air Force Form 781A maintenance discrepancy sheets with Red X / Red Diagonal symbols, JCN tracking numbers, military J-codes, and sortie re-allocation matrices.
               </p>
             </div>
 
@@ -310,42 +281,42 @@ export default function App() {
                 return (
                   <div
                     key={a.id}
-                    className={`uiverse-card p-5 flex flex-col justify-between transition ${
-                      isNMC ? 'border-rose-800/60 shadow-[0_0_15px_rgba(244,63,94,0.15)]' :
-                      isPMC ? 'border-amber-800/60 shadow-[0_0_15px_rgba(245,158,11,0.15)]' :
+                    className={`panel-card p-5 flex flex-col justify-between transition ${
+                      isNMC ? 'border-rose-900/60' :
+                      isPMC ? 'border-amber-900/60' :
                       ''
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="font-mono text-xs font-bold text-emerald-400 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-700">
+                        <span className="font-mono text-xs font-semibold text-slate-200 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
                           {a.asset_code}
                         </span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold ${
-                          isNMC ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.3)]' :
-                          isPMC ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' :
-                          'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                        }`}>
+                        <span className={
+                          isNMC ? 'status-badge-nmc text-[11px]' :
+                          isPMC ? 'status-badge-pmc text-[11px]' :
+                          'status-badge-fmc text-[11px]'
+                        }>
                           {a.status} ({a.readiness_score}%)
                         </span>
                       </div>
-                      <h3 className="text-sm font-bold text-white tracking-tight">{a.name}</h3>
+                      <h3 className="text-sm font-semibold text-white tracking-tight">{a.name}</h3>
                       <p className="text-xs text-slate-400 mt-0.5 font-sans">{a.model} • <span className="font-mono">{a.squadron}</span></p>
                       <p className="text-[11px] text-slate-400 font-mono mt-2">
                         Location: {a.base_location}
                       </p>
                     </div>
 
-                    <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                      <span className="text-[10px] font-mono text-slate-400">
+                    <div className="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
+                      <span className="text-[11px] font-mono text-slate-400">
                         {isNMC ? 'Grounding (Red X)' : isPMC ? 'Restricted (Red /)' : 'Fully Capable'}
                       </span>
                       <button
                         onClick={() => setViewMilStdAssetCode(a.asset_code)}
-                        className="uiverse-btn-ghost !py-1.5 !px-2.5 !text-[11px]"
+                        className="btn-secondary text-xs !py-1 !px-2.5"
                       >
                         <FileText className="w-3.5 h-3.5 text-blue-400" />
-                        <span>Inspect Mil-Std</span>
+                        <span>Inspect Form</span>
                       </button>
                     </div>
                   </div>
@@ -388,27 +359,28 @@ export default function App() {
 
       {/* Commander Morning Briefing Modal */}
       {briefingModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="uiverse-card max-w-2xl w-full p-6 relative shadow-2xl border border-slate-700/80">
+        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-2xl w-full p-6 relative shadow-2xl">
             <button 
               onClick={() => setBriefingModalOpen(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
-            <div className="flex items-center space-x-2 text-xs font-mono font-bold text-purple-400 mb-3">
+            <div className="flex items-center space-x-2 text-xs font-semibold text-purple-400 mb-3">
               <Sparkles className="w-4 h-4" />
-              <span>IBM watsonx.ai Granite 3-8B Executive Briefing</span>
+              <span>IBM watsonx.ai Granite 3-8B Operational Briefing</span>
             </div>
-            <div className="text-xs text-slate-200 whitespace-pre-wrap leading-relaxed font-sans bg-black/40 p-4 rounded-xl border border-purple-900/30">
+            <div className="text-xs text-slate-200 whitespace-pre-wrap leading-relaxed font-sans bg-slate-950/60 p-4 rounded-lg border border-purple-900/30 max-h-[60vh] overflow-y-auto">
               {briefingContent}
             </div>
-            <div className="mt-5 pt-3 border-t border-slate-800/80 flex justify-end">
+            <div className="mt-5 pt-3 border-t border-slate-800 flex justify-end">
               <button
                 onClick={() => setBriefingModalOpen(false)}
-                className="uiverse-btn-primary"
+                className="btn-primary text-xs"
               >
-                <span>Acknowledge Order of the Day</span>
+                <span>Acknowledge Briefing</span>
               </button>
             </div>
           </div>
