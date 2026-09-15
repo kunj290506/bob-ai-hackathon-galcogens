@@ -1,4 +1,4 @@
-﻿{
+{
   "mcpServers": {
     "mission-readiness-copilot": {
       "type": "streamable-http",
@@ -12,7 +12,10 @@
         "generate_maintenance_plan",
         "get_sensor_anomalies",
         "search_maintenance_history",
-        "get_mission_readiness_forecast"
+        "get_mission_readiness_forecast",
+        "simulate_mission_stress",
+        "get_mission_reallocation_matrix",
+        "generate_mil_std_work_order"
       ],
       "resources": [
         "fleet://status",

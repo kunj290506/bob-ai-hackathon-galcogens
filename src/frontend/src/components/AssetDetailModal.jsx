@@ -1,9 +1,11 @@
-﻿import React, { useState } from 'react'
-import { X, Sparkles, AlertTriangle, ShieldCheck, Clock, Wrench } from 'lucide-react'
+import React, { useState } from 'react'
+import { X, Sparkles, AlertTriangle, ShieldCheck, Clock, Wrench, FileText } from 'lucide-react'
+import MilStdModal from './MilStdModal.jsx'
 
 export default function AssetDetailModal({ asset, onClose, onAskCopilot }) {
   const [explanation, setExplanation] = useState(null)
   const [loadingExpl, setLoadingExpl] = useState(false)
+  const [showMilModal, setShowMilModal] = useState(false)
 
   if (!asset) return null
 
@@ -144,7 +146,15 @@ export default function AssetDetailModal({ asset, onClose, onAskCopilot }) {
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+          <button
+            onClick={() => setShowMilModal(true)}
+            className="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 border border-slate-700 transition flex items-center space-x-1.5"
+          >
+            <FileText className="w-4 h-4 text-blue-400" />
+            <span>AFTO Form 781A & ATO Matrix</span>
+          </button>
+
           <button
             onClick={() => {
               onClose()
@@ -157,6 +167,13 @@ export default function AssetDetailModal({ asset, onClose, onAskCopilot }) {
           </button>
         </div>
       </div>
+
+      {showMilModal && (
+        <MilStdModal
+          assetCode={asset.asset_code}
+          onClose={() => setShowMilModal(false)}
+        />
+      )}
     </div>
   )
 }

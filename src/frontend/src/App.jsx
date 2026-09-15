@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from './components/Navbar.jsx'
 import FleetStats from './components/FleetStats.jsx'
 import AssetCard from './components/AssetCard.jsx'
@@ -6,7 +6,9 @@ import AssetDetailModal from './components/AssetDetailModal.jsx'
 import PredictionsView from './components/PredictionsView.jsx'
 import WorkOrdersView from './components/WorkOrdersView.jsx'
 import CopilotChatDrawer from './components/CopilotChatDrawer.jsx'
-import { Plane, AlertTriangle, Clock, Wrench, Sparkles, Filter, X } from 'lucide-react'
+import SimulatorView from './components/SimulatorView.jsx'
+import MilStdModal from './components/MilStdModal.jsx'
+import { Plane, AlertTriangle, Clock, Wrench, Sparkles, Filter, X, Activity, FileText } from 'lucide-react'
 
 export default function App() {
   const [summary, setSummary] = useState(null)
@@ -25,6 +27,7 @@ export default function App() {
   
   const [statusFilter, setStatusFilter] = useState(null)
   const [typeFilter, setTypeFilter] = useState('ALL')
+  const [viewMilStdAssetCode, setViewMilStdAssetCode] = useState(null)
 
   // Load initial data
   useEffect(() => {
@@ -165,6 +168,30 @@ export default function App() {
             >
               <span>Upcoming Missions ({missions.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('simulator')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center space-x-2 ${
+                activeTab === 'simulator'
+                  ? 'bg-slate-800 text-white border border-slate-700 shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Activity className="w-4 h-4 text-amber-400" />
+              <span>Stress Simulator</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('milforms')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center space-x-2 ${
+                activeTab === 'milforms'
+                  ? 'bg-slate-800 text-white border border-slate-700 shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <FileText className="w-4 h-4 text-blue-400" />
+              <span>AFTO-781A & Sortie Matrix</span>
+            </button>
           </div>
 
           {/* Subsystem / Type Filter */}
@@ -250,7 +277,89 @@ export default function App() {
             ))}
           </div>
         )}
+
+        {/* Tab 5: Mission Stress Simulator */}
+        {activeTab === 'simulator' && (
+          <SimulatorView assets={assets} />
+        )}
+
+        {/* Tab 6: AFTO Form 781A & ATO Sortie Matrix */}
+        {activeTab === 'milforms' && (
+          <div className="space-y-6">
+            <div className="bg-[#0f1422] border border-slate-800 rounded-2xl p-6">
+              <div className="flex items-center space-x-2 mb-1">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  TACTICAL FLIGHT LINE DOCUMENTATION
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">MIL-STD-1388 / T.O. 00-20-1 Compliance</span>
+              </div>
+              <h2 className="text-xl font-bold text-white">AFTO Form 781A Discrepancies & Sortie Re-allocation</h2>
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                Automatically generate official Air Force Form 781A maintenance discrepancy sheets with Red X / Red Diagonal
+                symbols, JCN tracking numbers, J-code corrective actions, and evaluate mission-adaptive sortie profiles to prevent grounded sorties.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {assets.map(a => {
+                const isNMC = a.status === 'NMC'
+                const isPMC = a.status === 'PMC'
+                return (
+                  <div
+                    key={a.id}
+                    className={`bg-[#0f1422] border rounded-2xl p-5 flex flex-col justify-between transition ${
+                      isNMC ? 'border-rose-800/60 bg-rose-950/10' :
+                      isPMC ? 'border-amber-800/60 bg-amber-950/10' :
+                      'border-slate-800'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-mono text-xs font-bold text-emerald-400 bg-slate-900 px-2.5 py-1 rounded border border-slate-700">
+                          {a.asset_code}
+                        </span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                          isNMC ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40' :
+                          isPMC ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' :
+                          'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                        }`}>
+                          {a.status} ({a.readiness_score}%)
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-bold text-white">{a.name}</h3>
+                      <p className="text-xs text-slate-400 mt-0.5">{a.model} • {a.squadron}</p>
+                      <p className="text-[11px] text-slate-400 font-mono mt-2">
+                        Location: {a.base_location}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {isNMC ? 'Grounding (Red X)' : isPMC ? 'Restricted (Red /)' : 'Fully Capable'}
+                      </span>
+                      <button
+                        onClick={() => setViewMilStdAssetCode(a.asset_code)}
+                        className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white border border-slate-700 transition flex items-center space-x-1.5"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-blue-400" />
+                        <span>Inspect Mil-Std</span>
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Military Standard AFTO Form 781A & ATO Sortie Modal */}
+      {viewMilStdAssetCode && (
+        <MilStdModal
+          assetCode={viewMilStdAssetCode}
+          onClose={() => setViewMilStdAssetCode(null)}
+        />
+      )}
 
       {/* Asset Detail Diagnostics Modal */}
       {selectedAsset && (

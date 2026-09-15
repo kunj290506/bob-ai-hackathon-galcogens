@@ -8,7 +8,10 @@ The system bridges raw aerospace sensor telemetry with autonomous agentic intell
 2. **Forecasts Component Remaining Useful Life (RUL):** Uses GPU-accelerated XGBoost models trained on the **NASA C-MAPSS** turbofan degradation dataset to predict exact cycles/hours to failure.
 3. **Explains Root Causes in Natural Language:** Connects to **IBM watsonx.ai Granite 3-8B** to explain thermal creep, vibration harmonics, and failure mechanisms in plain language.
 4. **Optimizes Prioritized Maintenance Plans:** Ranks work orders dynamically based on mission criticality, technician labor capacity, and failure urgency before upcoming deployment windows.
-5. **Empowers Operators via IBM Bob Copilot:** Integrates directly with **IBM Bob** through the **Model Context Protocol (MCP)**, exposing 8 specialized operational tools.
+5. **Counterfactual Mission Stress & Environmental Twin:** Ingests theater conditions (Desert Heat 45°C, Sand/Dust particulate ingestion, Sub-Zero Arctic, and 9G combat air maneuvering) to forecast accelerated wear multipliers and mission survivability probability before platform commitment.
+6. **Mission-Adaptive Sortie Re-allocation (ATO Matching):** Dynamically matches degraded airframes (PMC) to secondary low-stress sortie profiles (Reconnaissance, Tactical Ferry, Ground Alert) instead of binary grounding, preserving combat generation tempo.
+7. **Automated Digital AFTO Form 781A Discrepancy Generator:** Auto-dispatches official defense maintenance discrepancy sheets with Red X grounding / Red Diagonal symbols, automated Job Control Numbers (JCN), military J-codes, and DLA National Stock Number (NSN) parts requisitions.
+8. **Empowers Operators via IBM Bob Copilot:** Integrates directly with **IBM Bob** through the **Model Context Protocol (MCP)**, exposing 11 specialized operational tools.
 
 ## How It Works
 ```
@@ -48,4 +51,4 @@ The system bridges raw aerospace sensor telemetry with autonomous agentic intell
 
 - **IBM Bob (Project Bob):** Acts as the autonomous operational copilot. Connects via `.bob/mcp.json` to our FastMCP endpoint at `http://localhost:8000/mcp`, enabling conversational fleet management, failure prediction, and work order generation.
 - **IBM watsonx.ai:** Generates natural language diagnostic briefings and explanations using the `ibm/granite-3-8b-instruct` foundation model via the official Python SDK.
-- **Model Context Protocol (FastMCP):** Implements Anthropic / IBM standard MCP tool interfaces exposing 8 specialized defense maintenance tools, resources, and prompt templates.
+- **Model Context Protocol (FastMCP):** Implements Anthropic / IBM standard MCP tool interfaces exposing 11 specialized defense maintenance tools, resources, and prompt templates.

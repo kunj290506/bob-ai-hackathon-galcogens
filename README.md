@@ -29,14 +29,17 @@ It predicts component Remaining Useful Life (RUL) using GPU-accelerated XGBoost 
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features & Breakthrough Innovations
 
-- **GPU-Accelerated RUL Prognostics (18.21 Cycles RMSE):** High-precision Remaining Useful Life regression trained on NASA C-MAPSS turbofan data across 108 engineered condition telemetry features.
+- **What-If Mission Stress & Environmental Digital Twin:** Counterfactual simulation engine evaluating operational degradation under harsh operational theaters (Desert Heat 45°C, Sand/Dust particulate ingestion, Sub-Zero Arctic, and 9G combat air maneuvering) to forecast accelerated wear multipliers and mission survivability probability before platform commitment.
+- **Mission-Adaptive Sortie Re-allocation Matrix:** Dynamic Air Tasking Order (ATO) matching engine. Instead of binary platform grounding (NMC), the engine dynamically matches degraded airframes (PMC) to secondary low-stress sortie profiles (Combat Air Patrol vs Close Air Support vs High-Altitude Reconnaissance vs Tactical Ferry), preserving combat generation tempo and saving critical sorties.
+- **Automated Digital AFTO Form 781A Discrepancy Generator:** Digital compliance with Air Force Technical Order 00-20-1 and DA Form 2404. Automatically dispatches official maintenance discrepancy sheets with Red X grounding / Red Diagonal symbols, automated Job Control Numbers (JCN), military J-codes, and Federal Defense Logistics Agency (DLA) National Stock Number (NSN) parts manifests.
+- **GPU-Accelerated RUL Prognostics (18.21 Cycles RMSE):** High-precision Remaining Useful Life regression trained on NASA C-MAPSS turbofan data across 108 engineered condition telemetry features with rolling exponential statistics.
 - **Condition-Based FMC / PMC / NMC Readiness Engine:** Evaluates multi-subsystem airworthiness (propulsion, gearboxes, hydraulics, radar) against mission deployment horizons.
-- **IBM Bob Copilot Integration via FastMCP:** Official Model Context Protocol (MCP) server at `/mcp` exposing 8 operational defense tools for autonomous querying, diagnostic investigations, and work order generation.
+- **IBM Bob Copilot Integration via FastMCP:** Official Model Context Protocol (MCP) server at `/mcp` exposing 11 autonomous defense tools for real-time querying, mission stress testing, diagnostic investigations, and work order generation.
 - **watsonx.ai Granite 3-8B Natural Language Diagnostics:** Delivers plain-language root cause explanations for thermal creep, vibration anomalies, and failure mechanisms with an intelligent dual-mode fallback.
 - **Mission-Aware Maintenance Optimizer:** Ranks and schedules work orders by: $\text{Priority} = f(\text{Mission Criticality}, \text{Predicted RUL}, \text{Technician Availability})$ to eliminate preventable mission aborts.
-- **Tactical Command Dashboard (Pure JSX):** Dark-mode command center displaying fleet readiness donut gauges, asset diagnostic cards, prognostics timeline, and live Copilot chat.
+- **Tactical Command Dashboard (Pure JSX):** Dark-mode command center displaying fleet readiness donut gauges, asset diagnostic cards, interactive mission stress simulator, official AFTO Form 781A viewer, prognostics timeline, and live Copilot chat.
 
 ---
 
@@ -140,6 +143,7 @@ npm run dev
 
 ## 🏅 What We're Most Proud Of
 
-1. **Load-Bearing IBM Bob Integration:** Bob is not a decorative name-drop. Via FastMCP, IBM Bob connects to our live backend over HTTP, querying real telemetry, executing RUL models, and generating work orders.
-2. **Real Aerospace Propulsion Physics:** We didn't use toy mock data. We preprocessed and engineered 108 condition features from NASA C-MAPSS turbofan engines, achieving an industry-grade holdout RMSE of **18.21 cycles**.
-3. **End-to-End Operational Loop:** From raw sensor anomaly $\rightarrow$ RUL forecast $\rightarrow$ readiness score $\rightarrow$ watsonx explanation $\rightarrow$ prioritized work order dispatch $\rightarrow$ commander briefing.
+1. **Transforming Predictive Maintenance into Mission-Adaptive Combat Generation:** Most systems stop at simple charts and generic failure predictions. We engineered a tactical flight-line system that goes far beyond: it runs physics-informed counterfactual mission stress simulations (desert heat, sandstorms, 9G turns), dynamically re-assigns degraded platforms to secondary Air Tasking Order (ATO) sorties to prevent lost missions, and auto-dispatches official Air Force AFTO Form 781A discrepancy orders with Red X grounding symbols and NSN parts requisition codes.
+2. **Real Aerospace Propulsion Physics (18.21 Cycles RMSE):** We didn't use toy mock data. We preprocessed and engineered 108 condition features from NASA C-MAPSS turbofan engines, running GPU-accelerated XGBoost models on an NVIDIA RTX 3050 to deliver battle-tested predictive precision.
+3. **Deep, Load-Bearing IBM Bob FastMCP & watsonx.ai Integration:** Bob is genuinely autonomous. Through FastMCP at `/mcp`, IBM Bob accesses 11 specialized tools to query fleet readiness, simulate theater environmental stress, synthesize Granite 3-8B diagnostic explanations, and generate expeditionary work orders in natural language.
+4. **End-to-End Operational Flywheel:** From raw HUMS telemetry anomaly $\rightarrow$ RUL forecast $\rightarrow$ FMC/PMC/NMC airworthiness assessment $\rightarrow$ watsonx.ai diagnostic explanation $\rightarrow$ ATO sortie re-allocation $\rightarrow$ prioritized maintenance turnaround $\rightarrow$ executive commander morning briefing.

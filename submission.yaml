@@ -17,7 +17,7 @@ team:
       email: "23dcs134@charusat.edu.in"
 
 submission:
-  title: "D1 Mission Readiness & Predictive Maintenance Copilot"
+  title: "D1 Mission Readiness and Predictive Maintenance Copilot"
 
   problem_statement: >
     Military organizations cannot reliably determine whether aircraft, vehicles,
@@ -27,18 +27,21 @@ submission:
     on maintenance, and unexpected platform failures cause weeks of operational downtime.
 
   solution_summary: >
-    We built an enterprise-grade Bob Copilot and modular monolith that ingests HUMS
+    We built an industry-grade, defense-ready Bob Copilot and modular monolith that ingests HUMS
     sensor telemetry and service records to classify asset readiness (FMC/PMC/NMC),
     predict component Remaining Useful Life (RUL) using GPU-accelerated ML trained on
-    NASA C-MAPSS data, explain degradation issues in natural language via watsonx.ai
-    Granite 3.0, and recommend prioritized maintenance plans optimized against mission deadlines.
+    NASA C-MAPSS data, simulate counterfactual environmental mission stress (desert heat, sandstorm ingestion, 9G combat turns),
+    dynamically match degraded platforms to secondary Air Tasking Order (ATO) sortie profiles to prevent lost combat tempo,
+    and auto-generate official digital AFTO Form 781A discrepancy work orders with Red X grounding symbols and DLA NSN parts requisitions
+    via IBM Bob FastMCP and watsonx.ai Granite 3.0.
 
   key_features:
-    - "GPU-accelerated XGBoost RUL prognostics trained on NASA C-MAPSS turbofan data (18.21 cycles RMSE)"
-    - "Condition-based FMC/PMC/NMC fleet readiness scoring and automated failure window conflict alerts"
-    - "IBM Bob Copilot integration via FastMCP exposing 8 operational tools and resource streams"
-    - "IBM watsonx.ai Granite 3-8B natural language readiness explanations and commander briefings"
-    - "Mission-window-aware maintenance optimizer scheduling work orders by mission criticality and technician availability"
+    - "Counterfactual Mission Stress and Environmental Twin: Simulates thermodynamic HPC/LPT thermal creep, sand/dust particulate ingestion, and 9G combat air maneuvering to calculate accelerated wear factors and mission survivability probability before takeoff."
+    - "Mission-Adaptive Sortie Re-allocation Matrix: Dynamic Air Tasking Order (ATO) matching engine that re-allocates degraded platforms (PMC) to viable low-stress sorties (Recon ISR / Ferry) instead of binary grounding, preserving combat generation tempo."
+    - "Automated Digital AFTO Form 781A and DA Form 2404 Generator: Defense-compliant digital discrepancy dispatching with official Red X / Red Diagonal symbols, automated Job Control Numbers (JCN), military J-codes, and DLA National Stock Number (NSN) parts requisitions."
+    - "GPU-Accelerated XGBoost RUL Prognostics on NASA C-MAPSS: 108 condition telemetry features with rolling exponential statistics predicting remaining useful life at 18.21 cycles holdout RMSE."
+    - "IBM Bob FastMCP Operational Copilot: Model Context Protocol exposing 11 autonomous tools and live resource streams connecting IBM Bob directly into the military fleet maintenance workflow."
+    - "Dual-Engine watsonx.ai Granite 3-8B Synthesis: Natural-language root cause explanation, thermodynamic telemetry anomaly interpretation, and commander morning readiness briefings."
 
   tech_stack:
     languages: ["Python", "JavaScript"]
@@ -48,11 +51,12 @@ submission:
     other: ["Docker", "Docker Compose", "XGBoost", "Scikit-Learn", "GitHub Actions"]
 
   what_we_are_most_proud_of: >
-    Our end-to-end integration between genuine aerospace sensor telemetry (NASA C-MAPSS),
-    GPU-accelerated RUL forecasting, and IBM Bob's Model Context Protocol (MCP). The Copilot
-    is load-bearing: an operator can talk to Bob in plain English, and Bob autonomously queries
-    telemetry, runs RUL models, explains root causes via watsonx.ai Granite, and prioritizes
-    work orders to ensure zero mission aborts.
+    Moving military aviation beyond static calendar maintenance and toy dashboards into an autonomous,
+    mission-adaptive combat generation system. Rather than just showing charts, our copilot acts as a
+    tactical flight officer: it runs physics-informed counterfactual mission stress simulations (desert heat,
+    sandstorms, 9G turns), dynamically re-assigns degraded platforms to compatible secondary sorties to prevent lost missions,
+    and auto-dispatches official Air Force AFTO Form 781A discrepancy orders with Red X grounding symbols and NSN parts requisition codes
+    via IBM Bob and watsonx.ai Granite.
 
   known_limitations: >
     Telemetry streaming is currently simulated from real NASA C-MAPSS turbofan run-to-failure cycles

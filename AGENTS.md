@@ -1,4 +1,4 @@
-﻿# AGENTS.md — IBM Bob Agent System & Copilot Directives
+# AGENTS.md — IBM Bob Agent System & Copilot Directives
 
 ## 1. Project Overview
 - **Project:** D1 Mission Readiness & Predictive Maintenance Copilot
@@ -20,6 +20,9 @@ IBM Bob acts as the autonomous operational copilot connecting to the local MCP s
 6. `get_sensor_anomalies(asset_code)`: Telemetry anomalies (thermal creep, vibration spikes, pressure drops).
 7. `search_maintenance_history(query_keyword)`: Search historical maintenance actions and part replacements.
 8. `get_mission_readiness_forecast()`: Mission capability assessment against upcoming deployment windows.
+9. `simulate_mission_stress(asset_code, mission_profile, sortie_duration_hours, sortie_g_rating)`: Physics-informed environmental stress simulator (ambient temp, sand/dust ingestion, 9G turns).
+10. `get_mission_reallocation_matrix(asset_code)`: Air Tasking Order (ATO) sortie matching engine for degraded assets.
+11. `generate_mil_std_work_order(asset_code)`: Digital AFTO Form 781A discrepancy document with Red X / Red Diagonal symbols and NSN parts requisitions.
 
 ## 3. Military Readiness Semantics
 - **FMC (Fully Mission Capable):** Asset can perform all primary combat missions (readiness score >= 85%).

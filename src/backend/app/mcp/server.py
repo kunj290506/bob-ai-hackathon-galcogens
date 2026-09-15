@@ -1,4 +1,4 @@
-﻿"""
+"""
 FastMCP Server for IBM Bob Integration.
 Exposes standard Model Context Protocol (MCP) tools, resources, and prompts
 enabling IBM Bob to serve as the autonomous Mission Readiness Copilot.
@@ -300,6 +300,98 @@ async def get_mission_readiness_forecast() -> str:
             })
             
         return json.dumps(forecast, indent=2)
+
+
+@mcp.tool()
+async def simulate_mission_stress(
+    asset_code: str,
+    mission_profile: str = "DESERT_HEAT",
+    sortie_duration_hours: float = 6.0,
+    sortie_g_rating: float = 7.0
+) -> str:
+    """
+    Simulates counterfactual environmental and combat severity (DESERT_HEAT, SAND_DUST_INGESTION,
+    COMBAT_HIGH_G, ARCTIC_COLD) to forecast accelerated component RUL wear and mission survivability probability.
+    """
+    from src.backend.app.core.simulation import simulate_mission_stress as run_simulation
+    async with async_session_factory() as session:
+        result = await session.execute(
+            select(Asset).filter(Asset.asset_code == asset_code.strip().upper()).options(selectinload(Asset.components))
+        )
+        asset = result.scalars().first()
+        if not asset:
+            return json.dumps({"error": f"Asset '{asset_code}' not found."})
+
+        # Base nominal telemetry
+        nominal_telemetry = {
+            "unit_nr": 1, "time_cycles": 1,
+            "s_2": 642.3, "s_3": 1586.9, "s_4": 1402.8, "s_7": 553.9,
+            "s_8": 2388.0, "s_9": 9060.0, "s_11": 47.3, "s_12": 521.9,
+            "s_13": 2388.0, "s_14": 8130.0, "s_15": 8.41, "s_17": 393.0,
+            "s_20": 38.9, "s_21": 23.3
+        }
+        res = run_simulation(
+            nominal_telemetry,
+            mission_profile=mission_profile,
+            mission_duration_hours=sortie_duration_hours,
+            sortie_g_rating=sortie_g_rating
+        )
+        res["asset_code"] = asset.asset_code
+        res["asset_name"] = asset.name
+        return json.dumps(res, indent=2)
+
+
+@mcp.tool()
+async def get_mission_reallocation_matrix(asset_code: str) -> str:
+    """
+    Air Tasking Order (ATO) matching: Instead of binary grounding, dynamically matches platform degradation
+    against specific mission stress envelopes (Combat Air Patrol, Close Air Support, ISR Recon, Tactical Ferry).
+    """
+    from src.backend.app.core.mission_matching import match_asset_to_sortie_profiles
+    async with async_session_factory() as session:
+        result = await session.execute(
+            select(Asset).filter(Asset.asset_code == asset_code.strip().upper()).options(selectinload(Asset.components))
+        )
+        asset = result.scalars().first()
+        if not asset:
+            return json.dumps({"error": f"Asset '{asset_code}' not found."})
+
+        lowest_rul = min([c.current_rul for c in asset.components]) if asset.components else 125.0
+        asset_dict = {"asset_code": asset.asset_code, "name": asset.name, "status": asset.status}
+        matrix = match_asset_to_sortie_profiles(asset_dict, lowest_component_rul=lowest_rul)
+        return json.dumps(matrix, indent=2)
+
+
+@mcp.tool()
+async def generate_mil_std_work_order(asset_code: str) -> str:
+    """
+    Generates an official digital AFTO Form 781A Aerospace Vehicle Maintenance Discrepancy Document
+    with military Red X/Diagonal symbols, discrepancy narratives, corrective J-codes, and NSN parts lists.
+    """
+    from src.backend.app.core.military_forms import generate_afto_form_781a
+    async with async_session_factory() as session:
+        result = await session.execute(
+            select(Asset).filter(Asset.asset_code == asset_code.strip().upper()).options(selectinload(Asset.components))
+        )
+        asset = result.scalars().first()
+        if not asset:
+            return json.dumps({"error": f"Asset '{asset_code}' not found."})
+
+        lowest_comp = min(asset.components, key=lambda c: c.current_rul) if asset.components else None
+        comp_name = lowest_comp.name if lowest_comp else "Turbofan Engine"
+        rul = lowest_comp.current_rul if lowest_comp else 18.4
+        serial = lowest_comp.serial_number if lowest_comp else "SN-ENG-101"
+
+        form = generate_afto_form_781a(
+            asset_code=asset.asset_code,
+            asset_model=asset.model,
+            serial_number=serial,
+            component_name=comp_name,
+            issue_description=f"Status: {asset.status} ({asset.readiness_score}%). RUL: {rul} hrs.",
+            severity="CRITICAL" if asset.status == "NMC" else "HIGH",
+            predicted_rul=rul
+        )
+        return json.dumps(form, indent=2)
 
 
 # ── 2. MCP RESOURCES ──────────────────────────────────────────────────────────
