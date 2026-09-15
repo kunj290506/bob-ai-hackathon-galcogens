@@ -145,10 +145,31 @@ python scripts/validate_submission.py
 
 | Artifact | Link |
 |---|---|
-| 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
+| 📹 Demo Video | [YouTube Video](https://youtu.be/CMim2XJHZC8) |
 | 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
 | 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/slides.pdf](presentation/) |
+
+### Application Screenshots
+
+![Dashboard Overview](demo/screenshots/screenshot-1.png)
+*Tactical Command Dashboard*
+
+![Asset Diagnostics](demo/screenshots/screenshot-2.png)
+*Detailed Asset Diagnostics*
+
+![Prognostics View](demo/screenshots/screenshot-3.png)
+*Predictive Degradation Timeline*
+
+![Mission Stress Simulator](demo/screenshots/screenshot-4.png)
+*Mission Stress Simulator*
+
+![Copilot Chat](demo/screenshots/screenshot-5.png)
+*IBM Bob AI Chatbot Integration*
+
+![Maintenance Optimizer](demo/screenshots/screenshot-6.png)
+*Mission-Aware Maintenance Optimizer*
+
+| 📊 Presentation | [ppt.pptx](presentation/ppt.pptx) |
 
 ---
 
