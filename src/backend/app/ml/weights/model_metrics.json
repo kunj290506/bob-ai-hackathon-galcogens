@@ -1,0 +1,77 @@
+{
+  "dataset": "FD001",
+  "trained_at": "2026-09-15 12:08:30",
+  "training_duration_seconds": 3.37,
+  "device": "cuda",
+  "train_samples": 20631,
+  "test_samples": 100,
+  "train_rmse": 13.54,
+  "train_mae": 9.73,
+  "train_r2": 0.8944,
+  "test_rmse": 18.21,
+  "test_mae": 12.75,
+  "test_r2": 0.7935,
+  "phm_score": 1089.21,
+  "top_features": [
+    {
+      "feature": "s_4_mean_10",
+      "importance": 0.2668839693069458
+    },
+    {
+      "feature": "s_4_mean_5",
+      "importance": 0.14424143731594086
+    },
+    {
+      "feature": "s_11_mean_10",
+      "importance": 0.11406413465738297
+    },
+    {
+      "feature": "s_11_mean_5",
+      "importance": 0.07922548055648804
+    },
+    {
+      "feature": "s_15_mean_10",
+      "importance": 0.0610431507229805
+    },
+    {
+      "feature": "s_15_mean_5",
+      "importance": 0.05044935271143913
+    },
+    {
+      "feature": "s_9_mean_5",
+      "importance": 0.030232584103941917
+    },
+    {
+      "feature": "s_9_mean_10",
+      "importance": 0.026549089699983597
+    },
+    {
+      "feature": "s_2_mean_10",
+      "importance": 0.019392607733607292
+    },
+    {
+      "feature": "s_3_mean_10",
+      "importance": 0.01599249616265297
+    },
+    {
+      "feature": "s_17_mean_10",
+      "importance": 0.008184395730495453
+    },
+    {
+      "feature": "s_21_mean_10",
+      "importance": 0.007961233146488667
+    },
+    {
+      "feature": "s_2_mean_5",
+      "importance": 0.007891072891652584
+    },
+    {
+      "feature": "s_21_mean_5",
+      "importance": 0.007629596162587404
+    },
+    {
+      "feature": "s_3_mean_5",
+      "importance": 0.007253081072121859
+    }
+  ]
+}
