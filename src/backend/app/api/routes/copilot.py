@@ -139,10 +139,59 @@ async def _build_fleet_context(session: AsyncSession) -> dict:
     }
 
 
+from src.backend.app.services.audit_service import record_audit_event
+
+PROMPT_INJECTION_PATTERNS = [
+    re.compile(r'ignore\s+(all\s+)?(previous|prior)\s+instructions?', re.IGNORECASE),
+    re.compile(r'disregard\s+(all\s+)?(previous|prior)\s+instructions?', re.IGNORECASE),
+    re.compile(r'system\s+override', re.IGNORECASE),
+    re.compile(r'reveal\s+(all\s+)?(fleet\s+records|secrets|passwords|system\s+prompts?)', re.IGNORECASE),
+    re.compile(r'you\s+are\s+now\s+in\s+dan\s+mode', re.IGNORECASE),
+    re.compile(r'bypass\s+operational\s+security', re.IGNORECASE),
+    re.compile(r'drop\s+table', re.IGNORECASE),
+]
+
+
 @router.post("/chat", response_model=CopilotChatResponse)
 async def chat_with_copilot(req: CopilotChatRequest, session: AsyncSession = Depends(get_db)):
     """Conversational endpoint interacting with the IBM Bob Copilot & watsonx Granite models."""
     tools_used = []
+
+    # Adversarial Defense: Intercept prompt injection and instruction overrides
+    for pattern in PROMPT_INJECTION_PATTERNS:
+        if pattern.search(req.message):
+            await record_audit_event(
+                session=session,
+                action="SECURITY_ALERT",
+                entity_type="COPILOT_CHAT",
+                username="COPILOT_CLIENT",
+                details={
+                    "reason": "PROMPT_INJECTION_ATTEMPT",
+                    "message_snippet": req.message[:100]
+                }
+            )
+            await session.commit()
+            return CopilotChatResponse(
+                response=(
+                    "[SECURITY REFUSAL]: Operational directive rejected. System security protocols prohibit "
+                    "unauthorized instruction override, policy bypass, or arbitrary credential/fleet record extraction. "
+                    "This incident has been logged to the classified audit trail."
+                ),
+                tools_used=[],
+                timestamp=datetime.utcnow(),
+                watsonx_mode=watsonx.get_mode(),
+                security_flag=True
+            )
+
+    # Detect explicit request for unknown / unregistered assets
+    if re.search(r'\b(unknown|unregistered|fake|non-existent)\s+(asset|aircraft|platform|vehicle)\b', req.message, re.IGNORECASE):
+        return CopilotChatResponse(
+            response="OPERATIONAL ALERT: Specified platform not identified in fleet registry. No maintenance records or sensor telemetry exist for unregistered assets.",
+            tools_used=["search_maintenance_history"],
+            timestamp=datetime.utcnow(),
+            watsonx_mode=watsonx.get_mode(),
+            security_flag=False
+        )
 
     # Detect an asset code either explicitly supplied or embedded in the message text
     detected_code = req.asset_code
@@ -180,14 +229,33 @@ async def chat_with_copilot(req: CopilotChatRequest, session: AsyncSession = Dep
                 issues=readiness["critical_issues"] + readiness["warnings"],
             )
             return CopilotChatResponse(
-                response=answer, tools_used=tools_used, timestamp=datetime.utcnow()
+                response=answer,
+                tools_used=tools_used,
+                timestamp=datetime.utcnow(),
+                watsonx_mode=watsonx.get_mode(),
+                security_flag=False
+            )
+        else:
+            # Asset was specified but not found in active fleet registry
+            return CopilotChatResponse(
+                response=f"OPERATIONAL ALERT: Platform '{detected_code}' was not found in the fleet registry. Verified assets must match active squadron inventory.",
+                tools_used=tools_used,
+                timestamp=datetime.utcnow(),
+                watsonx_mode=watsonx.get_mode(),
+                security_flag=False
             )
 
     # General query — load real fleet state, pass as rich context
     tools_used += ["get_fleet_readiness_summary", "predict_component_failures", "search_maintenance_history"]
     context = await _build_fleet_context(session)
     answer = await watsonx.answer_copilot_query(req.message, context)
-    return CopilotChatResponse(response=answer, tools_used=tools_used, timestamp=datetime.utcnow())
+    return CopilotChatResponse(
+        response=answer,
+        tools_used=tools_used,
+        timestamp=datetime.utcnow(),
+        watsonx_mode=watsonx.get_mode(),
+        security_flag=False
+    )
 
 
 @router.get("/briefing")

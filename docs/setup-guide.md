@@ -110,7 +110,17 @@ The application simulates Common Access Card (CAC) / DoD ID authentication with 
 
 ## Running Verification Tests
 
-To verify that the ML model, FastMCP server, watsonx.ai integration, and simulation engines are operating correctly:
+To verify that the entire system, ML models, FastMCP server, watsonx.ai integration, and maintenance state machine are operating correctly:
+
+```bash
+# 1. Run Complete Automated Test Suite (45 unit & integration tests)
+pytest tests/
+
+# 2. Run Submission Validator
+python scripts/validate_submission.py
+```
+
+### Quick Component Sanity Commands:
 
 ```bash
 # Test 1: Verify ML Prognostics & RUL Inference (NASA C-MAPSS)

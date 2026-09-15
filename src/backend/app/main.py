@@ -1,4 +1,4 @@
-﻿"""
+"""
 FastAPI Application Entry Point for D1 Mission Readiness & Predictive Maintenance Copilot.
 Combines RESTful API services, defense RBAC, ML inference, and the IBM Bob FastMCP server.
 """
@@ -14,6 +14,7 @@ from src.backend.app.api.routes.auth import router as auth_router
 from src.backend.app.api.routes.fleet import router as fleet_router
 from src.backend.app.api.routes.predictions import router as predictions_router
 from src.backend.app.api.routes.maintenance import router as maintenance_router
+from src.backend.app.api.routes.sensors import router as sensors_router
 from src.backend.app.api.routes.copilot import router as copilot_router
 from src.backend.app.mcp.server import mcp
 
@@ -52,6 +53,7 @@ app.include_router(auth_router, prefix=settings.API_V1_STR)
 app.include_router(fleet_router, prefix=settings.API_V1_STR)
 app.include_router(predictions_router, prefix=settings.API_V1_STR)
 app.include_router(maintenance_router, prefix=settings.API_V1_STR)
+app.include_router(sensors_router, prefix=settings.API_V1_STR)
 app.include_router(copilot_router, prefix=settings.API_V1_STR)
 
 

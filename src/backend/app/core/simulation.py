@@ -38,6 +38,9 @@ def simulate_mission_stress(
     - Injects thermodynamic temperature rise into HPC (T30) and LPT (T50)
     - Re-evaluates RUL using GPU-accelerated XGBoost
     - Calculates accelerated wear factor and mission survivability probability
+
+    NOTE: Explicitly designated as a WHAT-IF / COUNTERFACTUAL SIMULATION model,
+    not a certified physical digital twin.
     """
     profile = ENVIRONMENT_SEVERITY_FACTORS.get(mission_profile.upper(), ENVIRONMENT_SEVERITY_FACTORS["DESERT_HEAT"])
     wear_mult = profile["wear_multiplier"]
@@ -82,6 +85,9 @@ def simulate_mission_stress(
     )
 
     return {
+        "model_type": "COUNTERFACTUAL_WHAT_IF_SIMULATION",
+        "is_validated_physical_twin": False,
+        "disclaimer": "This is a counterfactual what-if simulation model for tactical stress forecasting, not an empirically certified hardware twin.",
         "mission_profile": mission_profile,
         "profile_description": profile["desc"],
         "planned_sortie_duration_hours": mission_duration_hours,

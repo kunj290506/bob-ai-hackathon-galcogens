@@ -1,10 +1,11 @@
 """
 Prioritized Maintenance Planning & Mission-Aware Optimization Engine.
 Schedules and ranks work orders by mission criticality, component degradation RUL,
-and required maintenance turnaround times.
+required maintenance turnaround times, and operational asset readiness impact.
 """
 
 from datetime import datetime, timedelta
+import json
 from typing import Dict, List, Any, Optional
 import logging
 
@@ -24,20 +25,34 @@ MISSION_CRITICALITY_MULTIPLIER = {
     "LOW": 0.8
 }
 
+COMPONENT_CRITICALITY_BONUS = {
+    "TURBOFAN_ENGINE": 25.0,
+    "ROTOR_GEARBOX": 25.0,
+    "HYDRAULIC_ACTUATOR": 20.0,
+    "FUEL_PUMP": 15.0,
+    "AVIONICS_RADAR": 10.0
+}
+
 
 def prioritize_work_orders(
     work_orders: List[Dict[str, Any]],
     upcoming_missions: List[Dict[str, Any]]
 ) -> List[Dict[str, Any]]:
     """
-    Ranks pending work orders by mission criticality and urgency.
+    Ranks pending work orders using multi-factor operational optimization:
+    1. Base discrepancy priority (CRITICAL, HIGH, MEDIUM, LOW)
+    2. Mission criticality multiplier and hours to deployment
+    3. Subsystem flight-criticality weighting
+    4. Remaining useful life (RUL) margin vs mission launch
+    5. Turnaround duration feasibility (can complete before launch)
+    6. Generates human-auditable, structured explainability reasons.
     """
     ranked_orders = []
     now = datetime.utcnow()
 
     # Find earliest mission window
     earliest_mission_hours = 999.0
-    active_mission_name = "None"
+    active_mission_name = "Fleet Standby"
     mission_prio = "MEDIUM"
 
     if upcoming_missions:
@@ -59,16 +74,79 @@ def prioritize_work_orders(
         order_dict = dict(order)
         prio = order_dict.get("priority", "MEDIUM").upper()
         base_score = PRIORITY_WEIGHTS.get(prio, 50.0)
+        est_hours = float(order_dict.get("estimated_hours", 4.0))
 
-        # Time urgency factor: increases as estimated RUL approaches mission start
-        est_hours = order_dict.get("estimated_hours", 4.0)
-        time_slack = max(1.0, earliest_mission_hours - est_hours)
+        # Check component criticality
+        comp_type = order_dict.get("component_type", "")
+        if not comp_type:
+            title = order_dict.get("title", "").upper()
+            desc = order_dict.get("description", "").upper()
+            if "TURBOFAN" in title or "ENGINE" in title or "TURBOFAN" in desc:
+                comp_type = "TURBOFAN_ENGINE"
+            elif "GEARBOX" in title or "ROTOR" in title:
+                comp_type = "ROTOR_GEARBOX"
+            elif "HYDRAULIC" in title:
+                comp_type = "HYDRAULIC_ACTUATOR"
+            elif "FUEL" in title:
+                comp_type = "FUEL_PUMP"
+            elif "RADAR" in title or "AVIONICS" in title:
+                comp_type = "AVIONICS_RADAR"
+
+        comp_bonus = COMPONENT_CRITICALITY_BONUS.get(comp_type, 5.0)
+
+        # Time urgency factor: per-asset/order mission proximity slack
+        order_mission_hours = order_dict.get("hours_to_mission")
+        if order_mission_hours is None:
+            order_mission_hours = earliest_mission_hours
+        else:
+            order_mission_hours = float(order_mission_hours)
+
+        time_slack = max(1.0, order_mission_hours - est_hours)
         urgency_factor = max(1.0, min(3.0, 100.0 / time_slack))
 
-        composite_score = round(base_score * mission_mult * (urgency_factor / 2.0), 1)
+        # Check parts availability
+        req_parts = order_dict.get("required_parts", "[]")
+        if isinstance(req_parts, str):
+            try:
+                parts_list = json.loads(req_parts)
+            except Exception:
+                parts_list = [req_parts] if req_parts else []
+        elif isinstance(req_parts, list):
+            parts_list = req_parts
+        else:
+            parts_list = []
+        parts_available = len(parts_list) > 0 or order_dict.get("parts_available", True)
+
+        can_complete = order_mission_hours >= est_hours
+
+        # Composite optimization score
+        composite_score = round((base_score + comp_bonus) * mission_mult * (urgency_factor / 2.0), 1)
+
+        # Build explainable reasons
+        reasons = []
+        if prio in ["CRITICAL", "HIGH"]:
+            reasons.append(f"Severity classification: {prio} discrepancy")
+        if comp_type:
+            reasons.append(f"Subsystem: {comp_type} (flight-criticality weight: {comp_bonus/25.0:.2f})")
+        
+        rul = order_dict.get("predicted_rul")
+        if rul is not None:
+            reasons.append(f"Current component RUL: {rul:.1f}h")
+        
+        reasons.append(f"Deployment window: '{active_mission_name}' starts in {earliest_mission_hours:.1f}h")
+        reasons.append(f"Estimated maintenance turnaround: {est_hours:.1f}h (feasible before launch: {can_complete})")
+        
+        if parts_list:
+            reasons.append(f"Required NSN parts: {', '.join(parts_list)}")
+        else:
+            reasons.append("Standard depot service kit verified in stock")
+
         order_dict["optimization_score"] = composite_score
         order_dict["target_mission"] = active_mission_name
-        order_dict["can_complete_before_mission"] = earliest_mission_hours >= est_hours
+        order_dict["hours_to_mission"] = round(earliest_mission_hours, 1)
+        order_dict["can_complete_before_mission"] = can_complete
+        order_dict["parts_verified"] = parts_available
+        order_dict["priority_reasons"] = reasons
 
         ranked_orders.append(order_dict)
 

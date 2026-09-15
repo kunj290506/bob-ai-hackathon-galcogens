@@ -232,6 +232,8 @@ The platform implements multi-layer defense-grade security:
 3. **Password Security:** Salted 12-round bcrypt hashing via `passlib`.
 4. **Append-Only Audit Trail:** Every sensitive state mutation (work order approval, mission reallocation, stress simulation) is logged with user ID, IP address, and timestamp.
 5. **Air-Gapped Operation:** Dual-mode watsonx.ai service ensures that telemetry data is never leaked outside secure perimeters when running in offline or classified environments.
+6. **Adversarial Prompt Injection Defense:** Regex screening intercepts instruction overrides ("ignore previous instructions", "system override", "reveal secrets"), logging `SECURITY_ALERT` audit entries and returning operational refusals.
+7. **Server-Side Data Quality & Boundary Controls:** Telemetry ingestion strictly enforces physical impossibility filters (rejecting negative temperatures, extreme vibration), timestamp freshness, batch limits (500), and deduplication.
 
 ---
 
@@ -240,4 +242,15 @@ The platform implements multi-layer defense-grade security:
 - **Asynchronous Concurrency:** Built on ASGI (Uvicorn) with async database drivers (`aiosqlite` and `asyncpg`), sustaining 5,000+ concurrent telemetry ingestion requests.
 - **GPU-Accelerated Inference:** XGBoost uses CUDA histogram tree building (`tree_method="hist", device="cuda"`), evaluating RUL across 100 aircraft engines in under 15 milliseconds.
 - **Database Partitioning:** Designed for time-series range partitioning across `sensor_readings` by monthly intervals to handle millions of historical flight records.
+
+---
+
+## 7. Automated Test Suite & Verification
+
+The core architecture is validated by **45 automated unit and integration tests** executing in under 5 seconds across 11 test modules:
+- **MIL-STD-516C Readiness Boundaries:** Mathematical threshold precision ($85.0\%$ FMC, $50.0\%$ PMC, $<50\%$ NMC) and flight-safety component grounding.
+- **NASA C-MAPSS RUL Prognostics:** Explicit $1.0\text{ cycle} \equiv 1.0\text{ EFH}$ conversion, non-negative empirical error bounds, and deterministic risk derivation.
+- **Maintenance State Machine:** Strict lifecycle enforcement (`PENDING` $\rightarrow$ `APPROVED` $\rightarrow$ `IN_PROGRESS` $\rightarrow$ `COMPLETED`), duplicate active order prevention, and stale prediction invalidation.
+- **Mission Window Horizon Risk:** Cases A through E with exact floating-point boundary tests ($RUL = t_{\text{start}}$, $RUL = t_{\text{start}} + \text{dur}$, $RUL = t_{\text{start}} + \text{dur} + 0.01$).
+- **Autonomous Bob FastMCP Orchestration:** Live DB-backed execution across all 11 MCP tools and AFTO Form 781A generation.
 

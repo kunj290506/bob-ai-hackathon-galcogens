@@ -1,4 +1,4 @@
-﻿"""Authentication and user management routes."""
+"""Authentication and user management routes."""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,6 +8,7 @@ from src.backend.app.core.security import create_access_token, verify_password
 from src.backend.app.db.base import get_db
 from src.backend.app.db.models import User
 from src.backend.app.schemas.auth import LoginRequest, TokenResponse, UserOut
+from src.backend.app.services.audit_service import record_audit_event
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -19,6 +20,15 @@ async def login(req: LoginRequest, session: AsyncSession = Depends(get_db)):
     user = res.scalars().first()
 
     if not user or not verify_password(req.password, user.hashed_password):
+        # Record failed login attempt in audit log
+        await record_audit_event(
+            session=session,
+            action="LOGIN_FAILED",
+            entity_type="USER",
+            username=req.username,
+            details={"reason": "Invalid credentials"}
+        )
+        await session.commit()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid defense personnel credentials"
@@ -30,6 +40,18 @@ async def login(req: LoginRequest, session: AsyncSession = Depends(get_db)):
         unit=user.unit,
         clearance_level=user.clearance_level
     )
+
+    # Record successful login in audit log
+    await record_audit_event(
+        session=session,
+        action="LOGIN_SUCCESS",
+        entity_type="USER",
+        username=user.username,
+        user_id=user.id,
+        details={"unit": user.unit, "role": user.role, "clearance": user.clearance_level}
+    )
+    await session.commit()
+
     return TokenResponse(
         access_token=token,
         username=user.username,

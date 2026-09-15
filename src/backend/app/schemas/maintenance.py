@@ -1,4 +1,4 @@
-﻿"""Maintenance work order and prediction schemas."""
+"""Maintenance work order and prediction schemas."""
 from datetime import datetime
 from typing import List, Optional, Any
 from pydantic import BaseModel
@@ -65,3 +65,5 @@ class CopilotChatResponse(BaseModel):
     response: str
     tools_used: List[str] = []
     timestamp: datetime
+    watsonx_mode: Optional[str] = "OFFLINE_DETERMINISTIC_SYNTHESIS"
+    security_flag: Optional[bool] = False

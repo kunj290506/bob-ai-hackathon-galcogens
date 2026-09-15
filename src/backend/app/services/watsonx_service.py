@@ -36,6 +36,10 @@ class WatsonxService:
             cls._instance = cls()
         return cls._instance
 
+    def get_mode(self) -> str:
+        """Returns the operational execution status of the watsonx service."""
+        return "LIVE_GRANITE" if self.is_live else "OFFLINE_DETERMINISTIC_SYNTHESIS"
+
     async def _call_live_watsonx(self, prompt: str, max_tokens: int = 500) -> Optional[str]:
         """Calls the live IBM watsonx.ai Foundation Model generation endpoint."""
         if not self.is_live:
