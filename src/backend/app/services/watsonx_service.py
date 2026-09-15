@@ -365,8 +365,48 @@ class WatsonxService:
             )
             return "\n".join(lines)
 
+        # ── Out-of-Scope Domain Boundary Notice ─────────────────────────────
+        out_of_scope_keywords = [
+            "cookie", "recipe", "super bowl", "football", "basketball", "baseball",
+            "weather in", "movie", "song", "joke", "celebrity", "president", "stock market",
+            "bitcoin", "crypto", "dating", "horoscope"
+        ]
+        if any(kw in query_lower for kw in out_of_scope_keywords):
+            return (
+                "**[OPERATIONAL DOMAIN NOTICE]**\n\n"
+                "I am **Bob**, the D1 Mission Readiness & Condition-Based Predictive Maintenance Copilot. "
+                "My operational directives are strictly scoped to military fleet airworthiness, condition-based diagnostics, "
+                "Remaining Useful Life (RUL) prognostics, maintenance work orders, and Air Tasking Order (ATO) sortie matching.\n\n"
+                "I cannot assist with queries outside defense fleet operations. "
+                "Please query me regarding fleet airworthiness (FMC/PMC/NMC), platform diagnostics, or upcoming mission windows."
+            )
+
+        # ── Intent: PMC platforms ────────────────────────────────────────────
+        elif any(kw in query_lower for kw in ["pmc", "partially mission", "partially capable", "degraded platform", "degraded asset", "degraded aircraft"]):
+            if not pmc_assets:
+                return f"No platforms are currently PMC. Fleet is at {rate:.1f}% FMC ({fmc_cnt}/{total} platforms)."
+            lines = ["**Partially Mission Capable (PMC) Platforms:**\n"]
+            for a in pmc_assets:
+                lines.append(
+                    f"- **{a.get('asset_code')}** ({a.get('name')}): "
+                    f"{a.get('readiness_score', 0):.1f}% readiness | "
+                    f"Lowest RUL: {a.get('lowest_rul', 0):.1f} hrs — "
+                    f"Recommend restricted sortie profile (non-combat)"
+                )
+            return "\n".join(lines)
+
+        # ── Intent: FMC / ready ──────────────────────────────────────────────
+        elif any(kw in query_lower for kw in ["fmc", "fully mission", "ready platform", "ready asset", "ready aircraft", "healthy platform"]):
+            fmc_assets = context_data.get("fmc_assets", [])
+            if not fmc_assets:
+                return f"Fleet is at {rate:.1f}% FMC. {fmc_cnt} of {total} platforms are Fully Mission Capable."
+            lines = [f"**Fully Mission Capable (FMC) Platforms ({fmc_cnt}/{total}):**\n"]
+            for a in fmc_assets[:10]:
+                lines.append(f"- **{a.get('asset_code')}** ({a.get('name')}): {a.get('readiness_score', 0):.1f}%")
+            return "\n".join(lines)
+
         # ── Intent: mission / sortie / deployment ────────────────────────────
-        elif any(kw in query_lower for kw in ["mission", "sortie", "deployment", "operation", "window", "ato", "realloc"]):
+        elif any(kw in query_lower for kw in ["sortie", "deployment", "operation", "mission window", "upcoming mission", "mission readiness", "ato", "realloc"]) or ("mission" in query_lower and not any(cap in query_lower for cap in ["partially", "fully", "pmc", "fmc", "nmc"])):
             if not active_missions:
                 return (
                     f"**Mission Readiness Assessment:**\n\n"
@@ -393,30 +433,6 @@ class WatsonxService:
         # ── Intent: briefing / summary / overview / status ───────────────────
         elif any(kw in query_lower for kw in ["briefing", "brief", "summary", "overview", "status", "report", "fleet"]):
             return await self.generate_fleet_briefing(fleet, active_missions)
-
-        # ── Intent: PMC platforms ────────────────────────────────────────────
-        elif any(kw in query_lower for kw in ["pmc", "partially", "degraded"]):
-            if not pmc_assets:
-                return f"No platforms are currently PMC. Fleet is at {rate:.1f}% FMC ({fmc_cnt}/{total} platforms)."
-            lines = ["**Partially Mission Capable (PMC) Platforms:**\n"]
-            for a in pmc_assets:
-                lines.append(
-                    f"- **{a.get('asset_code')}** ({a.get('name')}): "
-                    f"{a.get('readiness_score', 0):.1f}% readiness | "
-                    f"Lowest RUL: {a.get('lowest_rul', 0):.1f} hrs — "
-                    f"Recommend restricted sortie profile (non-combat)"
-                )
-            return "\n".join(lines)
-
-        # ── Intent: FMC / ready ──────────────────────────────────────────────
-        elif any(kw in query_lower for kw in ["fmc", "fully mission", "ready", "healthy"]):
-            fmc_assets = context_data.get("fmc_assets", [])
-            if not fmc_assets:
-                return f"Fleet is at {rate:.1f}% FMC. {fmc_cnt} of {total} platforms are Fully Mission Capable."
-            lines = [f"**Fully Mission Capable (FMC) Platforms ({fmc_cnt}/{total}):**\n"]
-            for a in fmc_assets[:10]:
-                lines.append(f"- **{a.get('asset_code')}** ({a.get('name')}): {a.get('readiness_score', 0):.1f}%")
-            return "\n".join(lines)
 
         # ── Default: fleet overview ──────────────────────────────────────────
         else:

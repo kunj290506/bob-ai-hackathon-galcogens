@@ -22,13 +22,26 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("MissionReadinessAPI")
 
 
+mcp_app = mcp.http_app(path="/")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initializes database tables on application startup."""
+    """Initializes database tables and FastMCP session manager on application startup."""
     logger.info("Initializing D1 Mission Readiness Copilot platform...")
     await init_db()
     logger.info("Database schema verified.")
-    yield
+
+    try:
+        from src.data.seed import seed_database
+        await seed_database()
+    except Exception as e:
+        logger.warning(f"Auto-seed check notice: {e}")
+
+    async with mcp_app.lifespan(app):
+        logger.info("FastMCP Streamable HTTP Server active.")
+        yield
+
     logger.info("Shutting down Mission Readiness Copilot platform.")
 
 
@@ -55,6 +68,13 @@ app.include_router(predictions_router, prefix=settings.API_V1_STR)
 app.include_router(maintenance_router, prefix=settings.API_V1_STR)
 app.include_router(sensors_router, prefix=settings.API_V1_STR)
 app.include_router(copilot_router, prefix=settings.API_V1_STR)
+
+# Mount FastMCP Server for IBM Bob
+try:
+    app.mount("/mcp", mcp_app)
+    logger.info("FastMCP Server mounted at /mcp for IBM Bob.")
+except Exception as e:
+    logger.error(f"Failed to mount FastMCP server: {e}")
 
 
 @app.get("/health", tags=["System"])

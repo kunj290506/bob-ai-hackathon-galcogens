@@ -276,9 +276,10 @@ async def search_maintenance_history(query_keyword: str) -> str:
 
 
 @mcp.tool()
-async def get_mission_readiness_forecast() -> str:
+async def get_mission_readiness_forecast(horizon_hours: float = 48.0) -> str:
     """
-    Forecasts whether the current fleet state can support upcoming combat and transport missions,
+    Forecasts whether the current fleet state can support upcoming combat and transport missions
+    within the specified operational horizon (default 48 hours),
     highlighting asset shortfalls if critical maintenance is not completed on time.
     """
     async with async_session_factory() as session:
