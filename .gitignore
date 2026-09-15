@@ -83,11 +83,9 @@ demo/*.avi
 demo/*.mkv
 
 # ── Docker volumes / local data ───────────────────────────────────────────────
-data/*
-!data/hums_sensor_data.csv
+data/
 logs/
 *.log
-!models/failure_model.joblib
 
 # ── Jupyter Notebooks (optional: remove if you want to commit notebooks) ──────
 # .ipynb_checkpoints/

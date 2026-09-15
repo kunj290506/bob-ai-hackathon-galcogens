@@ -1,80 +1,79 @@
 # Setup Guide
 
-Step-by-step instructions to run the Mission Readiness Copilot from scratch.
+> **This file is read by the automated evaluation pipeline. Be precise and complete.**
 
 ## Prerequisites
 
-- Python 3.11 or later
-- pip (comes with Python)
-- Git
+Before you begin, ensure you have the following installed:
 
-## 1. Clone the Repository
-
-```bash
-git clone https://github.com/kunjcr2/bob-ai-hackathon-Galcogens.git
-cd bob-ai-hackathon-Galcogens
-```
-
-## 2. Create a Virtual Environment
-
-```bash
-python -m venv .venv
-```
-
-Activate it:
-
-- **Windows**: `.venv\Scripts\activate`
-- **macOS / Linux**: `source .venv/bin/activate`
-
-## 3. Install Dependencies
-
-```bash
-pip install -r src/requirements.txt
-```
-
-## 4. Generate the Synthetic Dataset
-
-```bash
-python src/generate_data.py
-```
-
-This creates `data/hums_sensor_data.csv` with 1000 sensor readings across 25
-assets.
-
-## 5. Train the Model
-
-```bash
-python src/train_model.py
-```
-
-This trains a RandomForest classifier and saves it to
-`models/failure_model.joblib`. A classification report and feature importances
-are printed to the console.
-
-## 6. Launch the Dashboard
-
-```bash
-streamlit run src/app.py
-```
-
-The dashboard opens in your browser at `http://localhost:8501`. It has three
-tabs:
-
-1. **Asset Readiness Scores** -- sortable table with risk levels.
-2. **Predicted Failure Window** -- bar chart of 30-day failure probabilities.
-3. **Prioritized Maintenance Plan** -- flagged assets with explanations.
+- [ ] [e.g., Python 3.11+]
+- [ ] [e.g., Node.js 18+]
+- [ ] [e.g., Docker Desktop]
+- [ ] [e.g., An IBM Cloud account with watsonx.ai access]
 
 ## Environment Variables
 
-No environment variables are required for the base demo. If you need to
-configure any in the future, copy `src/.env.example` to `src/.env` and fill
-in the values. Never commit the `.env` file.
+Copy `.env.example` to `.env` and fill in the values:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Description | Required |
+|---|---|---|
+| `WATSONX_API_KEY` | Your IBM watsonx.ai API key | Yes |
+| `WATSONX_PROJECT_ID` | Your watsonx.ai project ID | Yes |
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `SLACK_WEBHOOK_URL` | Slack webhook for alerts | No |
+
+## Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/[your-org]/[your-repo].git
+cd [your-repo]
+
+# 2. Install backend dependencies
+[your command — e.g.: pip install -r requirements.txt]
+
+# 3. Install frontend dependencies (if applicable)
+[your command — e.g.: cd frontend && npm install]
+
+# 4. Set up the database (if applicable)
+[your command — e.g.: python manage.py migrate]
+```
+
+## Running the Application
+
+```bash
+# Start the backend
+[your command — e.g.: uvicorn app.main:app --reload]
+
+# Start the frontend (in a separate terminal, if applicable)
+[your command — e.g.: cd frontend && npm run dev]
+```
+
+The application will be available at: `http://localhost:[PORT]`
+
+## Running Tests
+
+```bash
+[your test command — e.g.: pytest tests/ -v]
+```
+
+## Quick Demo (Optional)
+
+If you have a demo script or sample data to showcase the project quickly:
+
+```bash
+[e.g.: python demo/seed_demo_data.py]
+[e.g.: open http://localhost:8000/demo]
+```
 
 ## Troubleshooting
 
-| Issue                          | Fix                                          |
-|--------------------------------|----------------------------------------------|
-| `ModuleNotFoundError`          | Ensure the virtual environment is activated  |
-| `FileNotFoundError` on CSV     | Run `python src/generate_data.py` first      |
-| `FileNotFoundError` on model   | Run `python src/train_model.py` first        |
-| Streamlit does not open        | Check that port 8501 is not in use           |
+| Issue | Solution |
+|---|---|
+| [e.g., `ModuleNotFoundError`] | [e.g., Run `pip install -r requirements.txt` again] |
+| [e.g., Database connection refused] | [e.g., Ensure PostgreSQL is running: `docker compose up db`] |
+| [e.g., watsonx.ai 401 error] | [e.g., Check `WATSONX_API_KEY` in your `.env` file] |

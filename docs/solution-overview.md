@@ -1,60 +1,41 @@
 # Solution Overview
 
+## What We Built
+
+[Describe your solution in plain language. Avoid jargon — write as if explaining to a smart colleague unfamiliar with your tech stack.]
+
 ## How It Works
 
-The Mission Readiness Copilot follows a four-stage pipeline that transforms raw
-sensor telemetry into actionable maintenance decisions.
+[Explain the core mechanism step by step. A numbered list or simple flow works well here.]
 
-### Stage 1: Data Ingestion
+1. [Step 1: e.g., "User connects their GitHub repository via OAuth"]
+2. [Step 2: e.g., "The system ingests pipeline logs and feeds them to watsonx.ai"]
+3. [Step 3: e.g., "An anomaly score is computed and displayed on the dashboard"]
+4. [Step 4: e.g., "Alerts are sent to Slack when the score exceeds a threshold"]
 
-A synthetic HUMS (Health and Usage Monitoring System) dataset simulates real
-sensor feeds from military assets. Each record contains:
+## Architecture Diagram
 
-- **vibration_g** -- accelerometer reading in g-force units
-- **temperature_c** -- operating temperature in Celsius
-- **oil_pressure_psi** -- hydraulic oil pressure in PSI
-- **usage_hours** -- cumulative operating hours
-- **maintenance_events** -- count of past maintenance actions
-- **days_since_maintenance** -- days elapsed since the last service
+> See [`architecture.md`](architecture.md) for the detailed diagram.
 
-A deterministic failure pattern is injected: assets with simultaneously high
-vibration, high temperature, low oil pressure, and long gaps since maintenance
-are labelled as likely to fail within 30 days.
+[Optionally include a simple ASCII or Mermaid diagram here for quick reference.]
 
-### Stage 2: Model Training
+```
+[User] → [Frontend: React] → [API: FastAPI] → [watsonx.ai] → [Dashboard]
+                                    ↓
+                             [PostgreSQL DB]
+```
 
-A scikit-learn RandomForestClassifier is trained on the labelled dataset. The
-model is deliberately simple and explainable:
+## Key Design Decisions
 
-- 100 decision trees with a maximum depth of 6.
-- Balanced class weights to handle the low failure rate.
-- Feature importances are extracted and surfaced to end users.
+| Decision | Rationale |
+|---|---|
+| [e.g., Used watsonx.ai for anomaly detection] | [e.g., Pre-trained models reduced time-to-value vs. building from scratch] |
+| [Decision 2] | [Rationale 2] |
+| [Decision 3] | [Rationale 3] |
 
-### Stage 3: Readiness Scoring
+## IBM Technologies Used
 
-For each asset, the trained model produces a failure probability. The readiness
-score is defined as `1 - failure_probability`. Assets are bucketed into risk
-levels (Low / Medium / High) for quick triage.
+[Explain specifically HOW you used each IBM technology — not just that you used it.]
 
-### Stage 4: Dashboard and Maintenance Plan
-
-A Streamlit dashboard presents three views:
-
-1. **Asset Readiness Scores** -- a sortable table of all assets with their
-   readiness scores and risk levels.
-2. **Predicted Failure Window** -- a horizontal bar chart showing 30-day failure
-   probabilities, color-coded by severity.
-3. **Prioritised Maintenance Plan** -- an expandable list of flagged assets with
-   the top sensor readings driving their risk, plus a maintenance recommendation.
-
-### IBM Bob's Role
-
-IBM Bob (Antigravity) was used throughout:
-
-- **Plan mode** to design the feature set and pipeline architecture before coding.
-- **Agent mode** to generate every source file, iterating on the dashboard layout
-  and model parameters.
-- The architecture diagram was produced through Bob.
-- The explainability layer (feature importances per asset) was designed through
-  iterative Bob prompts to ensure the output is understandable by a non-technical
-  logistics planner.
+- **[IBM Tech 1, e.g., watsonx.ai]:** [How it was used — e.g., "Used the `ibm/granite-13b-instruct-v2` model via the Python SDK to classify anomaly types from log text."]
+- **[IBM Tech 2]:** [How it was used]

@@ -1,69 +1,49 @@
 # Architecture
 
-## System Diagram
+## System Architecture
+
+[Describe the overall architecture of your system. Replace the Mermaid diagram below with your actual architecture.]
 
 ```mermaid
-flowchart LR
-    subgraph Data Layer
-        A["HUMS Sensors"] --> B["generate_data.py"]
-        B --> C["hums_sensor_data.csv"]
-    end
-
-    subgraph ML Layer
-        C --> D["train_model.py"]
-        D --> E["failure_model.joblib"]
-    end
-
-    subgraph Application Layer
-        C --> F["app.py (Streamlit)"]
-        E --> F
-        F --> G["Readiness Scores"]
-        F --> H["Failure Predictions"]
-        F --> I["Maintenance Plan"]
-    end
-
-    subgraph Dev Tooling
-        J["IBM Bob (Antigravity)"] -.->|scaffolded| B
-        J -.->|designed| D
-        J -.->|built| F
-    end
+graph TD
+    A[User / Browser] -->|HTTP| B[Frontend - React]
+    B -->|REST API| C[Backend - FastAPI]
+    C -->|SDK| D[watsonx.ai]
+    C -->|Query| E[PostgreSQL]
+    C -->|Publish| F[Slack Webhook]
+    D -->|Inference Result| C
 ```
 
-## Component Descriptions
+## Components
 
-### Data Layer
+| Component | Technology | Responsibility |
+|---|---|---|
+| Frontend | [e.g., React 18] | [e.g., Dashboard UI, user interaction] |
+| Backend API | [e.g., FastAPI] | [e.g., Business logic, orchestration] |
+| AI / ML | [e.g., watsonx.ai] | [e.g., Anomaly scoring, classification] |
+| Database | [e.g., PostgreSQL] | [e.g., Storing pipeline events and scores] |
+| Notifications | [e.g., Slack API] | [e.g., Alerting on threshold breaches] |
 
-| Component           | File                | Purpose                                      |
-|---------------------|---------------------|----------------------------------------------|
-| Data Generator      | `generate_data.py`  | Creates synthetic HUMS sensor readings       |
-| Dataset             | `hums_sensor_data.csv` | 1000 rows across 25 assets, CSV format    |
+## Data Flow
 
-The generator uses numpy's random number generation with a fixed seed for
-reproducibility. A deterministic failure pattern is injected so the model has
-a learnable signal.
+[Describe how data moves through your system from input to output.]
 
-### ML Layer
+1. [e.g., Pipeline logs are ingested via a webhook from GitHub Actions]
+2. [e.g., Logs are preprocessed and chunked into 512-token segments]
+3. [e.g., Each chunk is sent to the watsonx.ai inference endpoint]
+4. [e.g., Anomaly scores are stored in PostgreSQL]
+5. [e.g., The React dashboard polls the API every 30 seconds to refresh]
 
-| Component       | File              | Purpose                                        |
-|-----------------|-------------------|------------------------------------------------|
-| Trainer         | `train_model.py`  | Trains and evaluates a RandomForestClassifier  |
-| Saved Model     | `failure_model.joblib` | Serialised model for inference            |
+## Security Considerations
 
-The model uses scikit-learn exclusively. No custom ML code is written -- training,
-evaluation, and serialisation all use library calls.
+[Note any security decisions relevant to the architecture — even if basic.]
 
-### Application Layer
+- [e.g., API keys stored in environment variables, never committed to git]
+- [e.g., All API routes require a Bearer token]
+- [e.g., Database credentials rotated via IBM Secrets Manager]
 
-| Component            | File     | Purpose                                       |
-|----------------------|----------|-----------------------------------------------|
-| Streamlit Dashboard  | `app.py` | Interactive UI with three tabbed views        |
+## Scalability Notes
 
-The dashboard loads the CSV and model at startup (cached), computes per-asset
-failure probabilities, and presents readiness scores, a failure chart, and a
-prioritised maintenance plan with explainability.
+[Optional: how would this scale beyond the hackathon prototype?]
 
-### Dev Tooling
-
-IBM Bob (Antigravity) is shown with dashed arrows because it is a development-
-time dependency, not a runtime one. Bob was used in Agent mode to write every
-source file and in Plan mode to design the architecture before implementation.
+[e.g., "The FastAPI backend is stateless and could be horizontally scaled behind a load balancer. The watsonx.ai calls are the bottleneck and would benefit from request batching."]

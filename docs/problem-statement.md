@@ -1,37 +1,21 @@
 # Problem Statement
 
-## D1 - Mission Readiness and Predictive Maintenance
+## Background
 
-### The Problem
+[Describe the broader context. What domain or industry does this problem belong to? What situation creates the problem?]
 
-Military organisations operate large fleets of aircraft, ground vehicles, and
-specialised equipment. Mission success depends on knowing -- with confidence --
-which assets are ready to deploy. Today, that confidence does not exist:
+## The Problem
 
-- **Calendar-based maintenance** replaces parts on fixed schedules regardless of
-  actual wear, leading to either premature replacement (wasted cost) or missed
-  degradation (unexpected failure).
-- **HUMS sensor data goes unanalysed.** Modern platforms stream vibration,
-  temperature, and oil-pressure telemetry continuously, but the data sits in
-  logs that no one reviews until after a failure occurs.
-- **Readiness is assessed subjectively.** Unit commanders rely on crew chief
-  opinion and paper logbooks rather than a quantified, comparable readiness
-  score across the fleet.
+[State the problem clearly and specifically. Avoid vague statements like "things are slow" — instead say "Operations teams spend an average of 45 minutes per incident diagnosing pipeline failures because logs are scattered across 6 different tools."]
 
-### The Audience
+## Who is Affected
 
-- **Logistics planners** who allocate assets to missions and need a fleet-wide
-  readiness dashboard.
-- **Maintenance officers** who schedule work orders and need to know which assets
-  to prioritise before the next mission window.
-- **Commanding officers** who make go/no-go decisions and need a trustworthy,
-  explainable risk assessment.
+[Describe the specific user or persona experiencing this problem. Be concrete — not "developers" but "backend engineers managing CI/CD pipelines in enterprises with 50+ microservices."]
 
-### Why It Matters
+## Why It Matters
 
-A single in-mission failure can endanger lives, abort an objective, and cost
-millions. Predictive maintenance -- grounded in real sensor data and surfaced
-through an explainable AI model -- shifts the paradigm from reactive to
-proactive. Assets get serviced when they need it, missions launch with
-quantified confidence, and maintenance budgets are spent where they have the
-highest impact.
+[What is the cost of this problem? Lost time? Revenue? Safety risk? Frustration? Quantify if possible.]
+
+## Why Existing Solutions Fall Short
+
+[Briefly explain what people currently do and why it doesn't fully solve the problem. This sets up why your solution is needed.]
