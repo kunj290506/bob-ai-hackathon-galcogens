@@ -11,7 +11,7 @@
 | **Team Name** | Galcogens |
 | **Track** | AI |
 | **Team Lead** | Kunj — d24aiml082@charusat.edu.in |
-| **Members** | Vedant (23aiml042@charusat.edu.in), Parth (23aiml055@charusat.edu.in), Venisha (23dcs134@charusat.edu.in) |
+| **Members** | Vedant (23aiml042@charusat.edu.in), Path (23aiml055@charusat.edu.in), Venisha (23dcs134@charusat.edu.in) |
 
 ---
 

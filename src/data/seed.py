@@ -42,7 +42,7 @@ async def seed_database():
         users = [
             User(username="kunj.commander", email="d24aiml082@charusat.edu.in", hashed_password=default_hash, full_name="Col. Kunj (Commander)", role="commander", unit="388th Fighter Wing", clearance_level="TOP_SECRET"),
             User(username="vedant.maint", email="23aiml042@charusat.edu.in", hashed_password=default_hash, full_name="Maj. Vedant (Maintenance)", role="maintenance_officer", unit="388th Maintenance Group", clearance_level="SECRET"),
-            User(username="parth.logistics", email="23aiml055@charusat.edu.in", hashed_password=default_hash, full_name="Capt. Path (Logistics)", role="logistics_planner", unit="388th Logistics Readiness", clearance_level="SECRET"),
+            User(username="path.logistics", email="23aiml055@charusat.edu.in", hashed_password=default_hash, full_name="Capt. Path (Logistics)", role="logistics_planner", unit="388th Logistics Readiness", clearance_level="SECRET"),
             User(username="venisha.tech", email="23dcs134@charusat.edu.in", hashed_password=default_hash, full_name="Sgt. Venisha (Lead Technician)", role="technician", unit="388th Component Repair Sq", clearance_level="SECRET"),
             User(username="admin.sys", email="admin@galcogens.mil", hashed_password=default_hash, full_name="System Administrator", role="admin", unit="HQ AMC", clearance_level="TOP_SECRET"),
         ]

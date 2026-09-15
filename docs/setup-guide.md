@@ -100,7 +100,7 @@ The application simulates Common Access Card (CAC) / DoD ID authentication with 
 |---|---|---|---|
 | **Col. Kunj (Commander)** | `kunj.commander` | `Galcogens@2026` | Fleet-wide readiness visibility, morning briefings, sortie authorization, executive overview. |
 | **Maj. Vedant (Maintenance Officer)** | `vedant.maint` | `Galcogens@2026` | Work order approval, technician dispatch, maintenance bay prioritization. |
-| **Capt. Parth (Logistics Planner)** | `parth.logistics` | `Galcogens@2026` | Supply chain manifests, DLA NSN parts requisitions, inventory tracking. |
+| **Capt. Path (Logistics Planner)** | `path.logistics` | `Galcogens@2026` | Supply chain manifests, DLA NSN parts requisitions, inventory tracking. |
 | **Sgt. Venisha (Lead Technician)** | `venisha.tech` | `Galcogens@2026` | Step-by-step diagnostic inspection, AFTO Form 781A discrepancy execution. |
 
 > [!TIP]

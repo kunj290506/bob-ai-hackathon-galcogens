@@ -97,7 +97,7 @@ const STACK = [
 const TEAM = [
   { name: 'Kunj', role: 'Team Lead', email: 'd24aiml082@charusat.edu.in' },
   { name: 'Vedant', role: 'AI / ML Engineer', email: '23aiml042@charusat.edu.in' },
-  { name: 'Parth', role: 'Backend Engineer', email: '23aiml055@charusat.edu.in' },
+  { name: 'Path', role: 'Backend Engineer', email: '23aiml055@charusat.edu.in' },
   { name: 'Venisha', role: 'Systems Engineer', email: '23dcs134@charusat.edu.in' },
 ]
 

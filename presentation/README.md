@@ -21,5 +21,5 @@ This folder contains the official presentation slide deck for the **D1 Mission R
 | **09** | **Deep IBM Bob FastMCP Integration** | FastMCP server at `/mcp` exposing 11 autonomous tools for fleet summary, asset diagnostics, what-if stress tests, work order generation, and maintenance history search. |
 | **10** | **IBM watsonx.ai Granite Intelligence** | Plain-language diagnostic reasoning with `ibm/granite-3-8b-instruct`. Intelligent dual-mode engine guaranteeing crash-free execution in air-gapped / keyless test environments. |
 | **11** | **Operational Impact & Metrics** | 40% reduction in unplanned in-field failures, 20% reduction in MTTR, sustaining $\ge 85\%$ fleet FMC readiness rate, saving millions in emergency recovery logistics. |
-| **12** | **Team Galcogens Credentials** | Team roles, responsibilities, and institutional contacts (Kunj, Vedant, Parth, Venisha — CHARUSAT). |
+| **12** | **Team Galcogens Credentials** | Team roles, responsibilities, and institutional contacts (Kunj, Vedant, Path, Venisha — CHARUSAT). |
 

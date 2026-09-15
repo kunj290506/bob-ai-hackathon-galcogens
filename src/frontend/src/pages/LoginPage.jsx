@@ -5,7 +5,7 @@ import { Shield, Eye, EyeOff, AlertTriangle, User, Home } from 'lucide-react'
 const USERS = [
   { username: 'kunj.commander',  label: 'Col. Kunj',    role: 'Commander',          avatar: 'K', color: '#FFC000' },
   { username: 'vedant.maint',    label: 'Maj. Vedant',  role: 'Maintenance Officer', avatar: 'V', color: '#29ABE2' },
-  { username: 'parth.logistics', label: 'Capt. Parth',  role: 'Logistics Planner',  avatar: 'P', color: '#22C55E' },
+  { username: 'path.logistics', label: 'Capt. Path',  role: 'Logistics Planner',  avatar: 'P', color: '#22C55E' },
   { username: 'venisha.tech',    label: 'Sgt. Venisha', role: 'Lead Technician',     avatar: 'N', color: '#A855F7' },
 ]
 
