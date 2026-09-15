@@ -1,0 +1,27 @@
+﻿{
+  "mcpServers": {
+    "mission-readiness-copilot": {
+      "type": "streamable-http",
+      "url": "http://localhost:8000/mcp",
+      "description": "D1 Mission Readiness & Predictive Maintenance Copilot for Military Fleet Operations",
+      "tools": [
+        "get_fleet_readiness_summary",
+        "get_asset_readiness",
+        "predict_component_failures",
+        "explain_readiness_issue",
+        "generate_maintenance_plan",
+        "get_sensor_anomalies",
+        "search_maintenance_history",
+        "get_mission_readiness_forecast"
+      ],
+      "resources": [
+        "fleet://status",
+        "fleet://predictions/critical"
+      ],
+      "prompts": [
+        "morning_readiness_briefing",
+        "investigate_asset_failure"
+      ]
+    }
+  }
+}
