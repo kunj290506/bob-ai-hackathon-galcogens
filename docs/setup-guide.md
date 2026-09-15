@@ -1,79 +1,134 @@
-# Setup Guide
+# Setup Guide — D1 Mission Readiness & Predictive Maintenance Copilot
 
-> **This file is read by the automated evaluation pipeline. Be precise and complete.**
+> **This document is verified by automated evaluation pipelines and human judges. Follow these exact steps to run the platform.**
+
+---
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Ensure you have the following installed:
+- **Python:** 3.11+ (Python 3.11 recommended)
+- **Node.js:** v18+ (v20+ or v22+ recommended)
+- **Git**
+- **Docker & Docker Compose** (optional, for containerized run)
+- **NVIDIA GPU with CUDA** (optional; models automatically fallback to multi-threaded CPU if no GPU is detected)
 
-- [ ] [e.g., Python 3.11+]
-- [ ] [e.g., Node.js 18+]
-- [ ] [e.g., Docker Desktop]
-- [ ] [e.g., An IBM Cloud account with watsonx.ai access]
+---
 
-## Environment Variables
+## Option 1 — Quick Local Setup (Recommended)
 
-Copy `.env.example` to `.env` and fill in the values:
-
+### Step 1: Clone the Repository
 ```bash
-cp .env.example .env
+git clone https://github.com/kunj290506/bob-ai-hackathon-galcogens.git
+cd bob-ai-hackathon-galcogens
 ```
 
-| Variable | Description | Required |
-|---|---|---|
-| `WATSONX_API_KEY` | Your IBM watsonx.ai API key | Yes |
-| `WATSONX_PROJECT_ID` | Your watsonx.ai project ID | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `SLACK_WEBHOOK_URL` | Slack webhook for alerts | No |
-
-## Installation
-
+### Step 2: Set Up Python Virtual Environment
 ```bash
-# 1. Clone the repository
-git clone https://github.com/[your-org]/[your-repo].git
-cd [your-repo]
+# Windows
+py -3.11 -m venv .venv
+.\.venv\Scripts\activate
 
-# 2. Install backend dependencies
-[your command — e.g.: pip install -r requirements.txt]
+# Linux / macOS
+python3.11 -m venv .venv
+source .venv/bin/activate
 
-# 3. Install frontend dependencies (if applicable)
-[your command — e.g.: cd frontend && npm install]
-
-# 4. Set up the database (if applicable)
-[your command — e.g.: python manage.py migrate]
+# Upgrade pip and install dependencies
+pip install --upgrade pip
+pip install -r src/backend/requirements.txt
 ```
 
-## Running the Application
+### Step 3: Configure Environment Variables
+```bash
+# Copy example environment file
+cp src/.env.example .env
+```
+*(No edits required — default configuration runs seamlessly with SQLite and offline Granite dual-mode).*
+
+### Step 4: Seed the Database with Realistic Military Fleet Data
+```bash
+# Windows
+$env:PYTHONPATH="."
+python src/data/seed.py
+
+# Linux / macOS
+PYTHONPATH=. python src/data/seed.py
+```
+*Expected output: `Successfully seeded 20 assets, components, telemetry, ML predictions, and work orders!`*
+
+### Step 5: Start the Backend Server & MCP Endpoint
+```bash
+# Windows
+$env:PYTHONPATH="."
+uvicorn src.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Linux / macOS
+PYTHONPATH=. uvicorn src.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+- Backend API will be live at: `http://localhost:8000`
+- Interactive OpenAPI Docs: `http://localhost:8000/docs`
+- FastMCP Server endpoint for IBM Bob: `http://localhost:8000/mcp`
+
+### Step 6: Start the Frontend Command Dashboard (Separate Terminal)
+```bash
+cd src/frontend
+npm install
+npm run dev
+```
+- Dashboard will be available at: `http://localhost:5173`
+
+---
+
+## Option 2 — One-Command Docker Setup
+
+If you prefer running everything in Docker:
+```bash
+# Build and start all services (Backend + Frontend)
+docker compose up --build
+```
+- Frontend Dashboard: `http://localhost:3000`
+- Backend API: `http://localhost:8000`
+- API Documentation: `http://localhost:8000/docs`
+
+---
+
+## Running Verification Tests
+
+To verify that the ML model, database, and API endpoints are functioning properly:
 
 ```bash
-# Start the backend
-[your command — e.g.: uvicorn app.main:app --reload]
+# Test 1: Verify ML Prognostics & RUL Inference
+python -c "from src.backend.app.ml.predictor import FleetPredictor; p = FleetPredictor.get_instance(); print(p.predict_component_health([{'s_2': 643.0, 's_3': 1590.0, 's_4': 1410.0, 's_7': 553.0, 's_8': 2388.0, 's_9': 9060.0, 's_11': 47.5, 's_12': 521.0, 's_13': 2388.0, 's_14': 8130.0, 's_15': 8.45, 's_17': 393.0, 's_20': 38.8, 's_21': 23.3}], mission_window_hours=48.0))"
 
-# Start the frontend (in a separate terminal, if applicable)
-[your command — e.g.: cd frontend && npm run dev]
+# Test 2: Verify FastMCP Server Tools for IBM Bob
+python -c "import asyncio; from src.backend.app.mcp.server import get_fleet_readiness_summary; print(asyncio.run(get_fleet_readiness_summary()))"
+
+# Test 3: Verify watsonx.ai Readiness Explanation
+python -c "import asyncio; from src.backend.app.mcp.server import explain_readiness_issue; print(asyncio.run(explain_readiness_issue('F16-VIPER-101')))"
 ```
 
-The application will be available at: `http://localhost:[PORT]`
+---
 
-## Running Tests
+## Connecting IBM Bob via Model Context Protocol (MCP)
 
-```bash
-[your test command — e.g.: pytest tests/ -v]
-```
+The repository includes pre-configured `.bob/mcp.json` and `AGENTS.md` files:
+1. Start the backend server (`http://localhost:8000`).
+2. Open IBM Bob in your terminal or IDE.
+3. IBM Bob automatically detects `.bob/mcp.json` and connects to `http://localhost:8000/mcp`.
+4. Ask Bob in natural language:
+   - *"Bob, give me the morning fleet readiness briefing."*
+   - *"Which aircraft are currently NMC and why?"*
+   - *"Predict which components will fail before Friday's mission."*
+   - *"Generate an optimized maintenance plan for Sgt. Venisha."*
 
-## Quick Demo (Optional)
-
-If you have a demo script or sample data to showcase the project quickly:
-
-```bash
-[e.g.: python demo/seed_demo_data.py]
-[e.g.: open http://localhost:8000/demo]
-```
+---
 
 ## Troubleshooting
 
-| Issue | Solution |
-|---|---|
-| [e.g., `ModuleNotFoundError`] | [e.g., Run `pip install -r requirements.txt` again] |
-| [e.g., Database connection refused] | [e.g., Ensure PostgreSQL is running: `docker compose up db`] |
-| [e.g., watsonx.ai 401 error] | [e.g., Check `WATSONX_API_KEY` in your `.env` file] |
+| Issue | Cause | Solution |
+|---|---|---|
+| `ModuleNotFoundError: No module named 'src'` | Python path not set | Run commands with `PYTHONPATH=.` or set `$env:PYTHONPATH="."` on Windows. |
+| `sqlite3.OperationalError: no such table` | Database not seeded | Run `python src/data/seed.py` before starting the server. |
+| `CUDA out of memory` / No GPU | CUDA driver mismatch | Models automatically run on CPU; if needed, pass `device="cpu"` in `train_rul.py`. |
+| Port 8000 or 5173 already in use | Another process running | Kill the existing process or change the port in `.env`. |
+| watsonx.ai 401 Unauthorized | Invalid or missing API key | System operates automatically in offline Granite simulator mode when keys are omitted. |

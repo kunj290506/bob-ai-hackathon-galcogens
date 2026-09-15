@@ -1,6 +1,6 @@
-# 🚀 [Your Project Title Here]
+# 🛡️ D1 Mission Readiness & Predictive Maintenance Copilot
 
-> ⚠️ **Replace everything in `[ ]` brackets with your actual content before submission.**
+> **An enterprise-grade autonomous AI copilot engineered for defense aerospace and ground fleet condition-based maintenance (CBM+), powered by IBM Bob, watsonx.ai Granite 3.0, GPU-accelerated prognostics, and the Model Context Protocol (MCP).**
 
 ---
 
@@ -8,36 +8,35 @@
 
 | Field | Value |
 |---|---|
-| **Team Name** | [Your Team Name] |
-| **Track** | [AI / DevOps / Sustainability / Open] |
-| **Team Lead** | [Name] — [email@ibm.com] |
-| **Members** | [Name 1], [Name 2], [Name 3] |
+| **Team Name** | Galcogens |
+| **Track** | AI |
+| **Team Lead** | Kunj — d24aiml082@charusat.edu.in |
+| **Members** | Vedant (23aiml042@charusat.edu.in), Path (23aiml055@charusat.edu.in), Venisha (23dcs134@charusat.edu.in) |
 
 ---
 
 ## 🎯 Problem Statement
 
-> In 2–3 sentences: What problem does your project solve? Who experiences this problem?
-
-[Describe the real-world problem your project addresses. Be specific about who the user is and what pain point they face.]
+Military organizations cannot reliably determine whether aircraft, vehicles, and combat equipment are genuinely mission-ready. Maintenance runs on fixed calendar intervals regardless of actual component degradation, while onboard HUMS (Health & Usage Monitoring System) sensor streams that could forecast failures weeks in advance sit unanalyzed in data silos. When platforms fail unexpectedly in the field, operational readiness plummets, mission sorties are aborted, and recovery takes weeks. The US military spends **$90 Billion annually** on maintenance — shifting to predictive, condition-based maintenance saves billions and protects human lives.
 
 ---
 
 ## 💡 Solution
 
-> In 2–3 sentences: What did you build? How does it solve the problem above?
+We built the **D1 Mission Readiness & Predictive Maintenance Copilot**, a modular monolithic platform with an embedded **IBM Bob Copilot**. The system ingests HUMS sensor telemetry and historical service records to classify fleet readiness into military-standard **FMC** (Fully Mission Capable), **PMC** (Partially Mission Capable), and **NMC** (Non-Mission Capable) states. 
 
-[Describe your solution clearly. Explain the core mechanism — what makes it work.]
+It predicts component Remaining Useful Life (RUL) using GPU-accelerated XGBoost models trained on the **NASA C-MAPSS** aerospace turbofan degradation benchmark (achieving an holdout RMSE of **18.21 cycles**). It connects to **IBM watsonx.ai Granite 3-8B** to explain root-cause degradation in natural language and recommends an optimized, prioritized maintenance turnaround plan to guarantee fleet readiness before upcoming mission launch deadlines.
 
 ---
 
 ## ✨ Key Features
 
-- **Feature 1:** [Brief description — e.g., "Real-time anomaly detection using watsonx.ai"]
-- **Feature 2:** [Brief description]
-- **Feature 3:** [Brief description]
-- **Feature 4:** [Optional]
-- **Feature 5:** [Optional]
+- **GPU-Accelerated RUL Prognostics (18.21 Cycles RMSE):** High-precision Remaining Useful Life regression trained on NASA C-MAPSS turbofan data across 108 engineered condition telemetry features.
+- **Condition-Based FMC / PMC / NMC Readiness Engine:** Evaluates multi-subsystem airworthiness (propulsion, gearboxes, hydraulics, radar) against mission deployment horizons.
+- **IBM Bob Copilot Integration via FastMCP:** Official Model Context Protocol (MCP) server at `/mcp` exposing 8 operational defense tools for autonomous querying, diagnostic investigations, and work order generation.
+- **watsonx.ai Granite 3-8B Natural Language Diagnostics:** Delivers plain-language root cause explanations for thermal creep, vibration anomalies, and failure mechanisms with an intelligent dual-mode fallback.
+- **Mission-Aware Maintenance Optimizer:** Ranks and schedules work orders by: $\text{Priority} = f(\text{Mission Criticality}, \text{Predicted RUL}, \text{Technician Availability})$ to eliminate preventable mission aborts.
+- **Tactical Command Dashboard (Pure JSX):** Dark-mode command center displaying fleet readiness donut gauges, asset diagnostic cards, prognostics timeline, and live Copilot chat.
 
 ---
 
@@ -45,26 +44,42 @@
 
 | Category | Technologies |
 |---|---|
-| **Languages** | [e.g., Python, TypeScript] |
-| **Frameworks** | [e.g., FastAPI, React] |
-| **IBM Technologies** | [e.g., watsonx.ai, IBM Bob, IBM Cloud] |
-| **Databases** | [e.g., PostgreSQL, Redis] |
-| **Other** | [e.g., Docker, GitHub Actions] |
+| **Languages** | Python 3.11, JavaScript (Pure JSX / JS) |
+| **Frameworks** | FastAPI, React 18, Tailwind CSS, Vite |
+| **IBM Technologies** | IBM Bob, watsonx.ai (Granite 3-8B Instruct), Model Context Protocol (FastMCP) |
+| **Machine Learning** | XGBoost (CUDA GPU), Scikit-Learn, Isolation Forest, NASA C-MAPSS Benchmark |
+| **Databases** | SQLAlchemy 2.0 (Async), SQLite / PostgreSQL, aiosqlite, asyncpg |
+| **DevOps & Testing** | Docker, Docker Compose, Nginx, GitHub Actions |
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-├── src/                  # All source code
-├── docs/                 # Written documentation
+├── .bob/                 # IBM Bob MCP configuration (.bob/mcp.json)
+├── AGENTS.md             # IBM Bob Agent directives and domain semantics
+├── src/
+│   ├── backend/          # FastAPI modular monolith, ML models, & FastMCP server
+│   │   ├── app/
+│   │   │   ├── api/      # REST endpoints (auth, fleet, predictions, maintenance, copilot)
+│   │   │   ├── core/     # Readiness scoring, maintenance planner, security, config
+│   │   │   ├── db/       # SQLAlchemy 2.0 async models and session management
+│   │   │   ├── ml/       # C-MAPSS feature loader, GPU training, anomaly detector, weights
+│   │   │   ├── mcp/      # FastMCP server for IBM Bob integration (/mcp)
+│   │   │   └── services/ # watsonx.ai Granite service (dual-mode engine)
+│   │   └── requirements.txt
+│   ├── frontend/         # React 18 pure JSX command dashboard
+│   ├── data/             # Database seed scripts (20 military platforms + telemetry)
+│   └── .env.example      # Environment variables template
+├── docs/                 # Hackathon documentation
 │   ├── problem-statement.md
 │   ├── solution-overview.md
 │   ├── architecture.md
 │   └── setup-guide.md
 ├── demo/                 # Demo artifacts
-│   ├── screenshots/      # App screenshots
-│   └── demo-video-link.txt  # Link to demo video
+│   ├── screenshots/      # Application screenshots
+│   ├── demo-video-link.txt  # Link to demo walkthrough video
+│   └── live-demo-url.txt    # Live deployment status
 ├── presentation/         # Slide deck
 └── submission.yaml       # Structured submission metadata
 ```
@@ -73,23 +88,34 @@
 
 ## ⚡ How to Run
 
-> **Copy these exact steps from your [`docs/setup-guide.md`](docs/setup-guide.md)**
+> **For complete details, see [`docs/setup-guide.md`](docs/setup-guide.md)**
+
+### Quick Local Startup (3 Steps):
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/[your-repo].git
-cd [your-repo]
+# 1. Install backend dependencies in Python 3.11 virtual environment
+py -3.11 -m venv .venv
+.\.venv\Scripts\activate
+pip install -r src/backend/requirements.txt
 
-# 2. Install dependencies
-[your install command here]
+# 2. Seed database with realistic military fleet telemetry
+$env:PYTHONPATH="."
+python src/data/seed.py
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your values
-
-# 4. Run the project
-[your run command here]
+# 3. Start Backend & FastMCP Server
+uvicorn src.backend.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+In a separate terminal, launch the frontend:
+```bash
+cd src/frontend
+npm install
+npm run dev
+```
+
+- **Frontend Command Center:** `http://localhost:5173`
+- **FastAPI Interactive Docs:** `http://localhost:8000/docs`
+- **FastMCP Server for IBM Bob:** `http://localhost:8000/mcp`
 
 ---
 
@@ -106,16 +132,14 @@ cp .env.example .env
 
 ## ⚠️ Known Limitations
 
-> Be honest — judges appreciate transparency over overclaiming.
-
-- [Limitation 1: e.g., "Authentication is mocked — not production-ready"]
-- [Limitation 2: e.g., "Only tested on Chrome"]
-- [Limitation 3: e.g., "Feature X is scaffolded but not fully implemented"]
+- **Simulated Bus Telemetry:** Sensor streams are mapped from real run-to-failure NASA C-MAPSS turbofan data rather than a physical MIL-STD-1553 aircraft hardware bus.
+- **Dual-Mode AI Engine:** If an evaluator does not provide active IBM Cloud credentials in `.env`, the system activates an offline deterministic Granite 3-8B simulation engine to guarantee a crash-free experience.
+- **Authentication Bypass in Dev:** Token requirements default to Commander role in development mode to permit frictionless evaluation.
 
 ---
 
 ## 🏅 What We're Most Proud Of
 
-[Tell the judges what part of your submission is strongest and worth paying close attention to.]
-
----
+1. **Load-Bearing IBM Bob Integration:** Bob is not a decorative name-drop. Via FastMCP, IBM Bob connects to our live backend over HTTP, querying real telemetry, executing RUL models, and generating work orders.
+2. **Real Aerospace Propulsion Physics:** We didn't use toy mock data. We preprocessed and engineered 108 condition features from NASA C-MAPSS turbofan engines, achieving an industry-grade holdout RMSE of **18.21 cycles**.
+3. **End-to-End Operational Loop:** From raw sensor anomaly $\rightarrow$ RUL forecast $\rightarrow$ readiness score $\rightarrow$ watsonx explanation $\rightarrow$ prioritized work order dispatch $\rightarrow$ commander briefing.

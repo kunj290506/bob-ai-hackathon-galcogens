@@ -1,41 +1,51 @@
-# Solution Overview
+# Solution Overview — D1 Mission Readiness & Predictive Maintenance Copilot
 
 ## What We Built
+The **D1 Mission Readiness & Predictive Maintenance Copilot** is a production-grade, modular monolithic platform engineered for military fleet commanders, maintenance officers, and flight-line technicians. 
 
-[Describe your solution in plain language. Avoid jargon — write as if explaining to a smart colleague unfamiliar with your tech stack.]
+The system bridges raw aerospace sensor telemetry with autonomous agentic intelligence. By ingesting HUMS sensor data and historical service logs, the platform:
+1. **Accurately Classifies Platform Readiness:** Evaluates platforms into military standard Fully Mission Capable (**FMC**), Partially Mission Capable (**PMC**), and Non-Mission Capable (**NMC**) states.
+2. **Forecasts Component Remaining Useful Life (RUL):** Uses GPU-accelerated XGBoost models trained on the **NASA C-MAPSS** turbofan degradation dataset to predict exact cycles/hours to failure.
+3. **Explains Root Causes in Natural Language:** Connects to **IBM watsonx.ai Granite 3-8B** to explain thermal creep, vibration harmonics, and failure mechanisms in plain language.
+4. **Optimizes Prioritized Maintenance Plans:** Ranks work orders dynamically based on mission criticality, technician labor capacity, and failure urgency before upcoming deployment windows.
+5. **Empowers Operators via IBM Bob Copilot:** Integrates directly with **IBM Bob** through the **Model Context Protocol (MCP)**, exposing 8 specialized operational tools.
 
 ## How It Works
-
-[Explain the core mechanism step by step. A numbered list or simple flow works well here.]
-
-1. [Step 1: e.g., "User connects their GitHub repository via OAuth"]
-2. [Step 2: e.g., "The system ingests pipeline logs and feeds them to watsonx.ai"]
-3. [Step 3: e.g., "An anomaly score is computed and displayed on the dashboard"]
-4. [Step 4: e.g., "Alerts are sent to Slack when the score exceeds a threshold"]
-
-## Architecture Diagram
-
-> See [`architecture.md`](architecture.md) for the detailed diagram.
-
-[Optionally include a simple ASCII or Mermaid diagram here for quick reference.]
-
 ```
-[User] → [Frontend: React] → [API: FastAPI] → [watsonx.ai] → [Dashboard]
-                                    ↓
-                             [PostgreSQL DB]
+[HUMS Sensor Telemetry] ──> [Feature Engineering: 108 Channels]
+                                     │
+                                     ▼
+                      [GPU-Accelerated XGBoost Regressor]
+                                     │
+                                     ├──> Predicted RUL (Cycles / Hours)
+                                     └──> Unsupervised Isolation Forest (Anomaly Score)
+                                                 │
+                                                 ▼
+[Readiness Engine] <────────────────── [Subsystem Condition Scorer]
+        │
+        ├──> FMC / PMC / NMC Status Assessment
+        ├──> Conflict Detection against Mission Windows (e.g. 48-hr horizon)
+        └──> Prioritized Work Order Dispatch
+                 │
+                 ▼
+[FastMCP Server /mcp] <─── [IBM Bob Copilot] ───> [watsonx.ai Granite 3-8B]
+        │                                                     │
+        └──> 8 Operational Defense Tools                      └──> Natural Language
+             (Fleet, Diagnostics, Planning, History)                Readiness Explanations
 ```
 
 ## Key Design Decisions
 
 | Decision | Rationale |
 |---|---|
-| [e.g., Used watsonx.ai for anomaly detection] | [e.g., Pre-trained models reduced time-to-value vs. building from scratch] |
-| [Decision 2] | [Rationale 2] |
-| [Decision 3] | [Rationale 3] |
+| **Modular Monolith Architecture** | Eliminates distributed network overhead, guarantees ACID transactional integrity across flight logs and maintenance dispatches, and provides a single zero-friction deployable container. |
+| **NASA C-MAPSS Turbofan Benchmark** | Gold-standard aerospace benchmark (21 sensor channels: turbine temperatures, fan speeds, bypass ratios) ensuring models reflect real aerodynamic propulsion degradation physics. |
+| **FastMCP as the Copilot Protocol** | Makes IBM Bob load-bearing: Bob autonomously executes tools (`get_fleet_readiness_summary`, `explain_readiness_issue`, `generate_maintenance_plan`) over streamable HTTP. |
+| **Intelligent Dual-Mode watsonx Engine** | Guarantees seamless demonstration: calls live Granite 3-8B when IBM Cloud API keys are provided, and falls back to a deterministic offline Granite simulator if keys are absent (zero crash risk). |
+| **Pure JavaScript / JSX Frontend** | Strict adherence to hackathon team directives; delivers a responsive, dark-mode military tactical command center without TypeScript compilation complexity. |
 
 ## IBM Technologies Used
 
-[Explain specifically HOW you used each IBM technology — not just that you used it.]
-
-- **[IBM Tech 1, e.g., watsonx.ai]:** [How it was used — e.g., "Used the `ibm/granite-13b-instruct-v2` model via the Python SDK to classify anomaly types from log text."]
-- **[IBM Tech 2]:** [How it was used]
+- **IBM Bob (Project Bob):** Acts as the autonomous operational copilot. Connects via `.bob/mcp.json` to our FastMCP endpoint at `http://localhost:8000/mcp`, enabling conversational fleet management, failure prediction, and work order generation.
+- **IBM watsonx.ai:** Generates natural language diagnostic briefings and explanations using the `ibm/granite-3-8b-instruct` foundation model via the official Python SDK.
+- **Model Context Protocol (FastMCP):** Implements Anthropic / IBM standard MCP tool interfaces exposing 8 specialized defense maintenance tools, resources, and prompt templates.
