@@ -3,6 +3,9 @@
 # =============================================================================
 # IMPORTANT: Never commit secrets, credentials, or large binary files.
 
+# ── Internal Planning & AI Memory (not for submission) ────────────────────────
+ForAntigravity/
+
 # ── Secrets & Environment ─────────────────────────────────────────────────────
 .env
 .env.local
