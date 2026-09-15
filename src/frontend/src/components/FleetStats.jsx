@@ -1,5 +1,5 @@
-﻿import React from 'react'
-import { ShieldCheck, AlertTriangle, XCircle, Target } from 'lucide-react'
+import React from 'react'
+import { ShieldCheck, AlertTriangle, AlertOctagon, Target, Gauge } from 'lucide-react'
 
 export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
   const fmcPct = summary?.fmc_percentage ?? 70.0
@@ -10,26 +10,34 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      {/* 1. Fleet FMC Rate */}
+      {/* 1. Fleet FMC Rate Card */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'FMC' ? null : 'FMC')}
-        className={`p-4 rounded-xl border transition cursor-pointer ${
+        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'FMC' 
-            ? 'bg-emerald-950/40 border-emerald-500 shadow-lg shadow-emerald-950/50' 
-            : 'bg-slate-900/60 border-slate-800 hover:border-emerald-500/50'
+            ? 'ring-1 ring-emerald-500 border-emerald-500/80 shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
+            : ''
         }`}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-slate-400">Fleet Mission Readiness</span>
-          <ShieldCheck className="w-5 h-5 text-emerald-400" />
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+            FLEET READINESS INDEX
+          </span>
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <Gauge className="w-4 h-4" />
+          </div>
         </div>
-        <div className="flex items-baseline space-x-2">
-          <span className="text-3xl font-extrabold text-white font-mono">{fmcPct}%</span>
-          <span className="text-xs text-emerald-400 font-semibold">{fmc}/{total} FMC</span>
+
+        <div className="flex items-baseline justify-between">
+          <span className="text-3xl font-extrabold text-white font-mono tracking-tight">{fmcPct}%</span>
+          <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
+            {fmc}/{total} AIRWORTHY
+          </span>
         </div>
-        <div className="mt-3 w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+
+        <div className="mt-3 w-full bg-slate-950 rounded-full h-2 p-0.5 border border-slate-800">
           <div 
-            className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" 
+            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(16,185,129,0.6)]" 
             style={{ width: `${fmcPct}%` }}
           />
         </div>
@@ -38,61 +46,82 @@ export default function FleetStats({ summary, onFilterStatus, activeFilter }) {
       {/* 2. Fully Mission Capable (FMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'FMC' ? null : 'FMC')}
-        className={`p-4 rounded-xl border transition cursor-pointer ${
+        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'FMC' 
-            ? 'bg-emerald-950/40 border-emerald-500 shadow-lg' 
-            : 'bg-slate-900/60 border-slate-800 hover:border-emerald-500/50'
+            ? 'ring-1 ring-emerald-500 border-emerald-500/80 shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
+            : ''
         }`}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-slate-400">Fully Mission Capable (FMC)</span>
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+            FULLY MISSION CAPABLE
+          </span>
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <ShieldCheck className="w-4 h-4" />
+          </div>
         </div>
+
         <div className="flex items-baseline space-x-2">
-          <span className="text-3xl font-extrabold text-emerald-400 font-mono">{fmc}</span>
-          <span className="text-xs text-slate-400">Deployable Sorties</span>
+          <span className="text-3xl font-extrabold text-emerald-400 font-mono tracking-tight">{fmc}</span>
+          <span className="text-xs font-mono text-slate-400">Sortie-Ready</span>
         </div>
-        <p className="text-[11px] text-slate-400 mt-3">All flight & mission systems verified nominal.</p>
+        <p className="text-[11px] text-slate-400 mt-2 font-sans">
+          All primary combat avionics and propulsion verified nominal.
+        </p>
       </div>
 
       {/* 3. Partially Mission Capable (PMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'PMC' ? null : 'PMC')}
-        className={`p-4 rounded-xl border transition cursor-pointer ${
+        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'PMC' 
-            ? 'bg-amber-950/40 border-amber-500 shadow-lg' 
-            : 'bg-slate-900/60 border-slate-800 hover:border-amber-500/50'
+            ? 'ring-1 ring-amber-500 border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.3)]' 
+            : ''
         }`}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-slate-400">Partially Mission Capable (PMC)</span>
-          <AlertTriangle className="w-4 h-4 text-amber-400" />
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+            PARTIALLY MISSION CAPABLE
+          </span>
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <AlertTriangle className="w-4 h-4" />
+          </div>
         </div>
+
         <div className="flex items-baseline space-x-2">
-          <span className="text-3xl font-extrabold text-amber-400 font-mono">{pmc}</span>
-          <span className="text-xs text-slate-400">Secondary Degradation</span>
+          <span className="text-3xl font-extrabold text-amber-400 font-mono tracking-tight">{pmc}</span>
+          <span className="text-xs font-mono text-slate-400">Secondary Degradation</span>
         </div>
-        <p className="text-[11px] text-slate-400 mt-3">Restricted mission profiles only.</p>
+        <p className="text-[11px] text-slate-400 mt-2 font-sans">
+          Airframe restricted to secondary low-stress sortie envelopes.
+        </p>
       </div>
 
       {/* 4. Non-Mission Capable (NMC) */}
       <div 
         onClick={() => onFilterStatus(activeFilter === 'NMC' ? null : 'NMC')}
-        className={`p-4 rounded-xl border transition cursor-pointer ${
+        className={`uiverse-card p-5 cursor-pointer transition-all duration-200 ${
           activeFilter === 'NMC' 
-            ? 'bg-rose-950/40 border-rose-500 shadow-lg' 
-            : 'bg-slate-900/60 border-slate-800 hover:border-rose-500/50'
+            ? 'ring-1 ring-rose-500 border-rose-500/80 shadow-[0_0_20px_rgba(244,63,94,0.35)]' 
+            : ''
         }`}
       >
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-slate-400">Non-Mission Capable (NMC)</span>
-          <XCircle className="w-5 h-5 text-rose-500" />
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400">
+            NON-MISSION CAPABLE
+          </span>
+          <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-500">
+            <AlertOctagon className="w-4 h-4" />
+          </div>
         </div>
+
         <div className="flex items-baseline space-x-2">
-          <span className="text-3xl font-extrabold text-rose-500 font-mono">{nmc}</span>
-          <span className="text-xs text-rose-400 font-semibold">GROUNDED</span>
+          <span className="text-3xl font-extrabold text-rose-500 font-mono tracking-tight">{nmc}</span>
+          <span className="text-xs font-mono font-bold text-rose-400 tracking-wider">GROUNDED</span>
         </div>
-        <p className="text-[11px] text-rose-300 mt-3 font-medium">Critical failure predicted before next window.</p>
+        <p className="text-[11px] text-rose-300 mt-2 font-sans font-medium">
+          Imminent failure or critical safety limits exceeded. Priority turnaround required.
+        </p>
       </div>
     </div>
   )
