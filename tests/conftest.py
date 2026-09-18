@@ -1,4 +1,4 @@
-﻿"""
+"""
 Pytest configuration and shared fixtures for D1 Mission Readiness test suite.
 
 Creates all database tables and seeds reference data before any test runs.
@@ -14,6 +14,9 @@ os.environ.setdefault(
     "DATABASE_URL",
     "sqlite+aiosqlite:///./test_mission_readiness.db"
 )
+# Disable CUDA device driver during unit tests on Windows to avoid DLL unload stack corruption
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
+
 
 
 def pytest_configure(config):
