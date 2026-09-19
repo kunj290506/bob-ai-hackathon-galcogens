@@ -95,3 +95,62 @@ async def test_copilot_pmc_platforms():
         assert "get_fleet_readiness_summary" in res.tools_used
         # Must list the PMC airframes
         assert "F16-VIPER-103" in res.response or "4" in res.response
+
+
+@pytest.mark.asyncio
+async def test_copilot_fmc_cleared_platforms():
+    async with async_session_factory() as session:
+        req = CopilotChatRequest(message="Which aircraft are NOT grounded and cleared to fly?")
+        res = await chat_with_copilot(req, session)
+        assert "get_fleet_readiness_summary" in res.tools_used
+        assert "FMC COMBAT-CLEARED PLATFORMS" in res.response
+        assert "13" in res.response
+
+
+@pytest.mark.asyncio
+async def test_copilot_flight_clearance_verdict_denied():
+    async with async_session_factory() as session:
+        req = CopilotChatRequest(message="Can AH64-APACHE-401 fly combat missions tomorrow?")
+        res = await chat_with_copilot(req, session)
+        assert "get_asset_readiness" in res.tools_used
+        assert "FLIGHT CLEARANCE: DENIED" in res.response
+        assert "AH64-APACHE-401" in res.response
+
+
+@pytest.mark.asyncio
+async def test_copilot_sensor_anomalies_tool():
+    async with async_session_factory() as session:
+        req = CopilotChatRequest(message="Check sensor anomalies and vibration for AH64-APACHE-401")
+        res = await chat_with_copilot(req, session)
+        assert "get_sensor_anomalies" in res.tools_used
+        assert "SENSOR ANOMALY AUDIT" in res.response
+
+
+@pytest.mark.asyncio
+async def test_copilot_search_maintenance_history_tool():
+    async with async_session_factory() as session:
+        req = CopilotChatRequest(message="Show historical maintenance records for F16-VIPER-101")
+        res = await chat_with_copilot(req, session)
+        assert "search_maintenance_history" in res.tools_used
+        assert "HISTORICAL MAINTENANCE" in res.response
+
+
+@pytest.mark.asyncio
+async def test_copilot_out_of_domain_advisory():
+    async with async_session_factory() as session:
+        req = CopilotChatRequest(message="What is the capital of France?")
+        res = await chat_with_copilot(req, session)
+        assert "DOMAIN BOUNDARY ADVISORY" in res.response
+        assert "not process general internet trivia" in res.response
+
+
+@pytest.mark.asyncio
+async def test_copilot_conversational_courtesy():
+    async with async_session_factory() as session:
+        req1 = CopilotChatRequest(message="Thank you so much Bob, great job!")
+        res1 = await chat_with_copilot(req1, session)
+        assert "STANDING BY" in res1.response
+
+        req2 = CopilotChatRequest(message="Goodbye and signing off for the day")
+        res2 = await chat_with_copilot(req2, session)
+        assert "STANDING DOWN" in res2.response
