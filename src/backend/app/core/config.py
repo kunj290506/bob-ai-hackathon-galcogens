@@ -1,4 +1,4 @@
-﻿"""
+"""
 Configuration module for D1 Mission Readiness & Predictive Maintenance Copilot.
 Loads environment variables via pydantic-settings.
 """
@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     WATSONX_PROJECT_ID: Optional[str] = None
     WATSONX_URL: str = "https://us-south.ml.cloud.ibm.com"
     WATSONX_MODEL_ID: str = "ibm/granite-3-8b-instruct"
+
+    # Alternative Live LLM: Google Gemini (Optional)
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_MODEL: str = "gemini-2.0-flash"
 
     # FastMCP & IBM Bob Settings
     MCP_SERVER_NAME: str = "mission-readiness-copilot"

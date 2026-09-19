@@ -12,6 +12,7 @@ from src.backend.app.db.base import get_db
 from src.backend.app.db.models import Asset, Component, MissionWindow, WorkOrder
 from src.backend.app.schemas.maintenance import CopilotChatRequest, CopilotChatResponse
 from src.backend.app.services.watsonx_service import WatsonxService
+from src.backend.app.services.mcp_copilot import dispatch_copilot_chat
 
 router = APIRouter(prefix="/copilot", tags=["Bob Copilot"])
 watsonx = WatsonxService.get_instance()
@@ -201,59 +202,31 @@ async def chat_with_copilot(req: CopilotChatRequest, session: AsyncSession = Dep
             detected_code = m.group(1).upper()
 
     if detected_code:
-        tools_used += ["get_asset_readiness", "explain_readiness_issue"]
+        # Pre-check asset registry existence to prevent hallucination
         result = await session.execute(
-            select(Asset)
-            .filter(Asset.asset_code == detected_code.strip().upper())
-            .options(selectinload(Asset.components))
+            select(Asset).filter(Asset.asset_code == detected_code.strip().upper())
         )
         asset = result.scalars().first()
-        if asset:
-            components_data = [
-                {
-                    "name": c.name,
-                    "component_type": c.component_type,
-                    "current_rul": c.current_rul,
-                    "risk_level": c.risk_level,
-                    "status": c.status,
-                    "id": c.id,
-                }
-                for c in asset.components
-            ]
-            readiness = calculate_asset_readiness(components_data)
-            answer = await watsonx.explain_readiness_issue(
-                asset_code=asset.asset_code,
-                asset_name=asset.name,
-                status=readiness["status"],
-                score=readiness["readiness_score"],
-                issues=readiness["critical_issues"] + readiness["warnings"],
-            )
-            return CopilotChatResponse(
-                response=answer,
-                tools_used=tools_used,
-                timestamp=datetime.utcnow(),
-                watsonx_mode=watsonx.get_mode(),
-                security_flag=False
-            )
-        else:
-            # Asset was specified but not found in active fleet registry
+        if not asset:
             return CopilotChatResponse(
                 response=f"OPERATIONAL ALERT: Platform '{detected_code}' was not found in the fleet registry. Verified assets must match active squadron inventory.",
-                tools_used=tools_used,
+                tools_used=["search_maintenance_history"],
                 timestamp=datetime.utcnow(),
                 watsonx_mode=watsonx.get_mode(),
                 security_flag=False
             )
 
-    # General query — load real fleet state, pass as rich context
-    tools_used += ["get_fleet_readiness_summary", "predict_component_failures", "search_maintenance_history"]
-    context = await _build_fleet_context(session)
-    answer = await watsonx.answer_copilot_query(req.message, context)
+    # Dispatch to MCP Copilot Engine (Google Gemini Free Tool Calling or Autonomous MCP Tool Dispatcher)
+    answer, tools_used, mode = await dispatch_copilot_chat(
+        user_message=req.message,
+        detected_asset_code=detected_code
+    )
+
     return CopilotChatResponse(
         response=answer,
         tools_used=tools_used,
         timestamp=datetime.utcnow(),
-        watsonx_mode=watsonx.get_mode(),
+        watsonx_mode=mode,
         security_flag=False
     )
 

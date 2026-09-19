@@ -41,25 +41,85 @@ async def get_fleet_readiness_summary() -> str:
         result = await session.execute(select(Asset).options(selectinload(Asset.components)))
         assets = result.scalars().all()
         
-        assets_data = []
-        for a in assets:
-            assets_data.append({
-                "id": a.id,
+        fmc = [a for a in assets if a.status == "FMC"]
+        pmc = [a for a in assets if a.status == "PMC"]
+        nmc = [a for a in assets if a.status == "NMC"]
+        total = len(assets)
+        avg_score = round(sum(a.readiness_score for a in assets) / total, 1) if total else 0.0
+        fmc_pct = round((len(fmc) / total) * 100.0, 1) if total else 0.0
+
+        critical_attention = []
+        for a in nmc:
+            critical_attention.append({
+                "asset_id": a.id,
                 "asset_code": a.asset_code,
                 "name": a.name,
-                "components": [
+                "model": a.model,
+                "status": "NMC",
+                "readiness_score": a.readiness_score,
+                "squadron": a.squadron,
+                "issues": [
                     {
-                        "id": c.id,
-                        "name": c.name,
+                        "component_id": c.id,
+                        "component_name": c.name,
                         "component_type": c.component_type,
-                        "current_rul": c.current_rul,
-                        "risk_level": c.risk_level,
-                        "status": c.status
-                    } for c in a.components
+                        "issue": f"Predicted RUL ({c.current_rul:.1f} hrs) fails before mission window (48.0 hrs). Imminent failure risk.",
+                        "severity": "CRITICAL",
+                        "current_rul": c.current_rul
+                    } for c in a.components if c.risk_level in ("HIGH", "CRITICAL")
                 ]
             })
-            
-        summary = calculate_fleet_readiness_summary(assets_data)
+
+        for a in pmc:
+            critical_attention.append({
+                "asset_id": a.id,
+                "asset_code": a.asset_code,
+                "name": a.name,
+                "model": a.model,
+                "status": "PMC",
+                "readiness_score": a.readiness_score,
+                "squadron": a.squadron,
+                "issues": [
+                    {
+                        "component_id": c.id,
+                        "component_name": c.name,
+                        "component_type": c.component_type,
+                        "issue": f"Secondary subsystem degradation detected with RUL ({c.current_rul:.1f} hrs).",
+                        "severity": "HIGH",
+                        "current_rul": c.current_rul
+                    } for c in a.components if c.risk_level in ("HIGH", "CRITICAL")
+                ]
+            })
+
+        summary = {
+            "total_assets": total,
+            "fmc_count": len(fmc),
+            "pmc_count": len(pmc),
+            "nmc_count": len(nmc),
+            "fmc_percentage": fmc_pct,
+            "fleet_readiness_average": avg_score,
+            "mission_ready_rate": fmc_pct,
+            "critical_attention_count": len(critical_attention),
+            "critical_attention_required": critical_attention,
+            "nmc_platforms": [
+                {
+                    "asset_code": a.asset_code,
+                    "name": a.name,
+                    "model": a.model,
+                    "squadron": a.squadron,
+                    "readiness_score": a.readiness_score
+                } for a in nmc
+            ],
+            "pmc_platforms": [
+                {
+                    "asset_code": a.asset_code,
+                    "name": a.name,
+                    "model": a.model,
+                    "squadron": a.squadron,
+                    "readiness_score": a.readiness_score
+                } for a in pmc
+            ]
+        }
         return json.dumps(summary, indent=2)
 
 

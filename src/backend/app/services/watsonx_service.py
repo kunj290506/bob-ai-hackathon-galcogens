@@ -23,10 +23,23 @@ class WatsonxService:
         self.project_id = settings.WATSONX_PROJECT_ID
         self.url = settings.WATSONX_URL
         self.model_id = settings.WATSONX_MODEL_ID
-        self.is_live = bool(self.api_key and self.project_id)
+        self.gemini_key = settings.GEMINI_API_KEY
+        self.gemini_model = settings.GEMINI_MODEL
 
-        if self.is_live:
-            logger.info(f"WatsonxService initialized in LIVE mode with model: {self.model_id}")
+        # Detect placeholder values copied from .env.example
+        is_placeholder = any(
+            p in (self.api_key or "").lower() for p in ["your_ibm_cloud", "placeholder", "xxx", "your_api_key"]
+        ) or any(
+            p in (self.project_id or "").lower() for p in ["your_watsonx", "placeholder", "xxx", "your_project"]
+        )
+        self.is_live_watsonx = bool(self.api_key and self.project_id and not is_placeholder)
+        self.is_live_gemini = bool(self.gemini_key and not any(p in (self.gemini_key or "").lower() for p in ["your_", "placeholder", "xxx"]))
+        self.is_live = self.is_live_watsonx or self.is_live_gemini
+
+        if self.is_live_watsonx:
+            logger.info(f"WatsonxService initialized in LIVE WATSONX mode with model: {self.model_id}")
+        elif self.is_live_gemini:
+            logger.info(f"WatsonxService initialized in LIVE GEMINI mode with model: {self.gemini_model}")
         else:
             logger.info("WatsonxService initialized in DUAL-MODE (Offline Granite 3-8B Engine Active). Zero crash guarantee.")
 
@@ -38,51 +51,83 @@ class WatsonxService:
 
     def get_mode(self) -> str:
         """Returns the operational execution status of the watsonx service."""
-        return "LIVE_GRANITE" if self.is_live else "OFFLINE_DETERMINISTIC_SYNTHESIS"
+        if self.is_live_watsonx:
+            return "LIVE_GRANITE_WATSONX"
+        elif self.is_live_gemini:
+            return "LIVE_GEMINI"
+        return "OFFLINE_DETERMINISTIC_SYNTHESIS"
 
-    async def _call_live_watsonx(self, prompt: str, max_tokens: int = 500) -> Optional[str]:
-        """Calls the live IBM watsonx.ai Foundation Model generation endpoint."""
-        if not self.is_live:
+    async def _call_live_gemini(self, prompt: str, max_tokens: int = 500) -> Optional[str]:
+        """Calls Google Gemini API as an alternative live foundation model."""
+        if not self.is_live_gemini:
             return None
         try:
-            # Generate IAM token from IBM Cloud API Key
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                token_resp = await client.post(
-                    "https://iam.cloud.ibm.com/identity/token",
-                    data={"grant_type": "urn:ibm:params:oauth:grant-type:apikey", "apikey": self.api_key},
-                    headers={"Content-Type": "application/x-www-form-urlencoded"}
-                )
-                if token_resp.status_code != 200:
-                    logger.warning(f"Failed to obtain IBM IAM token: {token_resp.text}. Falling back to Granite engine.")
-                    return None
-
-                access_token = token_resp.json().get("access_token")
-
-                # Call watsonx text generation
-                gen_url = f"{self.url}/ml/v1/text/generation?version=2023-05-29"
-                payload = {
-                    "input": prompt,
-                    "model_id": self.model_id,
-                    "project_id": self.project_id,
-                    "parameters": {
-                        "decoding_method": "greedy",
-                        "max_new_tokens": max_tokens,
-                        "temperature": 0.2,
-                        "repetition_penalty": 1.1
-                    }
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent?key={self.gemini_key}"
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "maxOutputTokens": max_tokens,
+                    "temperature": 0.2
                 }
-                gen_resp = await client.post(
-                    gen_url,
-                    json=payload,
-                    headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
-                )
-                if gen_resp.status_code == 200:
-                    results = gen_resp.json().get("results", [])
-                    if results:
-                        return results[0].get("generated_text", "").strip()
+            }
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.post(url, json=payload)
+                if resp.status_code == 200:
+                    candidates = resp.json().get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        if parts:
+                            return parts[0].get("text", "").strip()
+                logger.warning(f"Live Gemini API call returned {resp.status_code}: {resp.text[:150]}")
         except Exception as e:
-            logger.warning(f"Live watsonx API call error: {e}. Gracefully reverting to Granite engine.")
-            return None
+            logger.warning(f"Live Gemini API call error: {e}")
+        return None
+
+    async def _call_live_watsonx(self, prompt: str, max_tokens: int = 500) -> Optional[str]:
+        """Calls the live IBM watsonx.ai Foundation Model generation endpoint (or Gemini fallback)."""
+        # Try Watsonx if configured
+        if self.is_live_watsonx:
+            try:
+                async with httpx.AsyncClient(timeout=10.0) as client:
+                    token_resp = await client.post(
+                        "https://iam.cloud.ibm.com/identity/token",
+                        data={"grant_type": "urn:ibm:params:oauth:grant-type:apikey", "apikey": self.api_key},
+                        headers={"Content-Type": "application/x-www-form-urlencoded"}
+                    )
+                    if token_resp.status_code == 200:
+                        access_token = token_resp.json().get("access_token")
+                        gen_url = f"{self.url}/ml/v1/text/generation?version=2023-05-29"
+                        payload = {
+                            "input": prompt,
+                            "model_id": self.model_id,
+                            "project_id": self.project_id,
+                            "parameters": {
+                                "decoding_method": "greedy",
+                                "max_new_tokens": max_tokens,
+                                "temperature": 0.2,
+                                "repetition_penalty": 1.1
+                            }
+                        }
+                        gen_resp = await client.post(
+                            gen_url,
+                            json=payload,
+                            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
+                        )
+                        if gen_resp.status_code == 200:
+                            results = gen_resp.json().get("results", [])
+                            if results:
+                                return results[0].get("generated_text", "").strip()
+                    else:
+                        logger.warning(f"Failed to obtain IBM IAM token: {token_resp.text}. Falling back to alternative engine.")
+            except Exception as e:
+                logger.warning(f"Live watsonx API call error: {e}. Gracefully reverting.")
+
+        # Try Gemini if configured
+        if self.is_live_gemini:
+            gemini_res = await self._call_live_gemini(prompt, max_tokens)
+            if gemini_res:
+                return gemini_res
+
         return None
 
     async def explain_readiness_issue(

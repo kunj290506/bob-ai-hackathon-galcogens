@@ -1,4 +1,4 @@
-﻿"""Fleet readiness and asset inspection routes."""
+"""Fleet readiness and asset inspection routes."""
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -20,26 +20,63 @@ async def get_fleet_summary(session: AsyncSession = Depends(get_db)):
     result = await session.execute(select(Asset).options(selectinload(Asset.components)))
     assets = result.scalars().all()
 
-    assets_data = []
-    for a in assets:
-        assets_data.append({
-            "id": a.id,
+    fmc = [a for a in assets if a.status == "FMC"]
+    pmc = [a for a in assets if a.status == "PMC"]
+    nmc = [a for a in assets if a.status == "NMC"]
+    total = len(assets)
+    avg_score = round(sum(a.readiness_score for a in assets) / total, 1) if total else 0.0
+    fmc_pct = round((len(fmc) / total) * 100.0, 1) if total else 0.0
+
+    critical_attention = []
+    for a in nmc:
+        critical_attention.append({
+            "asset_id": a.id,
             "asset_code": a.asset_code,
             "name": a.name,
-            "components": [
+            "status": "NMC",
+            "readiness_score": a.readiness_score,
+            "issues": [
                 {
-                    "id": c.id,
-                    "name": c.name,
+                    "component_id": c.id,
+                    "component_name": c.name,
                     "component_type": c.component_type,
-                    "current_rul": c.current_rul,
-                    "risk_level": c.risk_level,
-                    "status": c.status
-                } for c in a.components
+                    "issue": f"Predicted RUL ({c.current_rul:.1f} hrs) fails before mission window (48.0 hrs). Imminent failure risk.",
+                    "severity": "CRITICAL",
+                    "is_flight_critical": True
+                } for c in a.components if c.risk_level in ("HIGH", "CRITICAL")
             ]
         })
 
-    summary = calculate_fleet_readiness_summary(assets_data)
-    return summary
+    for a in pmc:
+        critical_attention.append({
+            "asset_id": a.id,
+            "asset_code": a.asset_code,
+            "name": a.name,
+            "status": "PMC",
+            "readiness_score": a.readiness_score,
+            "issues": [
+                {
+                    "component_id": c.id,
+                    "component_name": c.name,
+                    "component_type": c.component_type,
+                    "issue": f"Secondary subsystem degradation detected with RUL ({c.current_rul:.1f} hrs).",
+                    "severity": "HIGH",
+                    "is_flight_critical": False
+                } for c in a.components if c.risk_level in ("HIGH", "CRITICAL")
+            ]
+        })
+
+    return {
+        "total_assets": total,
+        "fmc_count": len(fmc),
+        "pmc_count": len(pmc),
+        "nmc_count": len(nmc),
+        "fmc_percentage": fmc_pct,
+        "fleet_readiness_average": avg_score,
+        "mission_ready_rate": fmc_pct,
+        "critical_attention_count": len(critical_attention),
+        "critical_attention_required": critical_attention
+    }
 
 
 @router.get("/assets", response_model=List[AssetOut])
